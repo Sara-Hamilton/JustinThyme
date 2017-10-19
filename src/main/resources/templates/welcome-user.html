@@ -2,7 +2,7 @@
 <!--<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">-->
 <!--TODO why does intelliJ recommend the above ref?-->
 
-<html lang="en" xmlns:th="http://www.thymeleaf.org/">
+<html lang="en" xmlns:th="http://www.thymeleaf.org/" xmlns="http://www.w3.org/1999/html">
 
 <head th:replace="fragments :: head">
 
@@ -12,16 +12,40 @@
 <nav th:replace="fragments :: navigation"></nav>
 
 <h1 th:text="|Welcome ${user.username}|">Default welcome</h1>
-<p>Page under construction.</p>
+<!--<p>Page under construction.</p>-->
 
-<!--<h2>Here are the contents of your seed packet:</h2>-->
 
-<!--<tr th:each="seed : ${packet.seeds}">-->
-    <!--<ul>-->
-        <!--<li th:text="|${seed.name} crops are typically grown in ${seed.season}|. Reminder: {seed.reminder}"></li>-->
-        <!--&lt;!&ndash;TODO make seed.reminder == "ON" or "OFF"&ndash;&gt;-->
-    <!--</ul>-->
+<h2>Here are the contents of your seed packet:</h2>
+<table class="table">
+    <tr>
+        <th>Name</th>
+        <th>Plant Date</th>
+        <th>Reminder</th>
+    </tr>
+
+
+    <tr th:each="seed :${seeds}">
+    <td th:text="${seed.name}"></td>
+    <td th:text="${seed.plantDate}"></td>
+    <!--<td th:text="${seed.reminder}"></td>-->
+
+    </tr>
+
+
+<!--<h2>Here are what you might want to add in your area:</h2>-->
+
+
+</table>
+
 <!--</tr>-->
+<!--&lt;!&ndash;<tr th:each="seed : ${packet.seeds}">&ndash;&gt;-->
+    <!--&lt;!&ndash;<ul>&ndash;&gt;-->
+        <!--&lt;!&ndash;<li th:text="|${packet.seed.name} crops are typically grown in ${seed.season}|. Reminder: {seed.reminder}"></li>&ndash;&gt;-->
+        <!--&lt;!&ndash;&lt;!&ndash;TODO make seed.reminder == "ON" or "OFF"&ndash;&gt;&ndash;&gt;-->
+    <!--&lt;!&ndash;</ul>&ndash;&gt;-->
+<!--&lt;!&ndash;</tr>&ndash;&gt;-->
+
+
 
 </body>
 </html>

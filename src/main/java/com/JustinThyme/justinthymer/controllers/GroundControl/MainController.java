@@ -154,14 +154,15 @@ public class MainController {
             System.out.println("=====================" + number);
             timer.schedule(new TwillTask.TwillReminder(message, number), date);
         }
+
         model.addAttribute("user", currentUser);
         model.addAttribute("packet", aPacket);
+        model.addAttribute("seeds",aPacket.getSeeds());
+
         return "/welcome-user";
 
 
     }
-
-
 
 
 
