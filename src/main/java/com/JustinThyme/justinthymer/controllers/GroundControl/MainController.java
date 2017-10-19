@@ -93,7 +93,7 @@ public class MainController {
                 model.addAttribute("title", "Try again");
                 model.addAttribute(newUser);
                 model.addAttribute("areas", Seed.Area.values());
-            } else if (password != "" && password.equals(verifyPassword)){
+            } else if (password.equals(verifyPassword)){
                 model.addAttribute("title", "Try again");
                 model.addAttribute(newUser);
                 model.addAttribute("areas", Seed.Area.values());
