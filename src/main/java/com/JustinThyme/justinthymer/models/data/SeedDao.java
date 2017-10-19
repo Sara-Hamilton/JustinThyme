@@ -13,11 +13,7 @@ import java.util.List;
 public interface SeedDao extends CrudRepository<Seed, Integer> {
 
     List<Seed> findByArea(Seed.Area area);
-    /*
-    {
-        return SeedDao.query.filter_by(area=area).find_all();
-    }
-*/
+
     List<Seed> findByName(String name);
 
     List<Seed> findBySeason(Seed.Season season);

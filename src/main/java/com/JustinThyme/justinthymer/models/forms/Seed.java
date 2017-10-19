@@ -52,7 +52,7 @@ public class Seed {
                 plantDate = new Date(118, 8, 1, 19, 05);
                 break;
             case TONIGHT:
-                plantDate = new Date(117, 9, 18, 16, 32);
+                plantDate = new Date(117, 9, 19, 16, 05);
                 break;
             default:
                plantDate = null;
@@ -65,9 +65,6 @@ public class Seed {
     public Date plantDate;
 
     Boolean reminder; //note package private so can set in Packet
-
-//    @ManyToMany
-//    private List<Packet> packets = new ArrayList<>();
 
 
     //note reminder not in constructor so defaulted to false (intentional)
@@ -116,11 +113,11 @@ public class Seed {
         this.plantDate = plantDate;
     }
 
-    //note following in Packet for now
-//    public Boolean getReminder() {
-//        return reminder;
-//    }
-//
+
+    public Boolean getReminder() {
+        return reminder;
+    }
+//note following in packet
 //    public void setReminder(Boolean reminder) {
 //        this.reminder = reminder;
 //    }
