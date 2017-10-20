@@ -123,6 +123,18 @@ public class MainController {
         String password = newUser.getPassword();
         //newUser.checkPassword();
 
+        // username must be unique
+        Iterable<User> users = userDao.findAll();
+        for (User user : users) {
+            if (user.getUsername().equals(username)) {
+                model.addAttribute("title", "Try again");
+                model.addAttribute(newUser);
+                model.addAttribute("areas", Seed.Area.values());
+                model.addAttribute("userErrorMessage", "That username is taken.");
+                return "/signup";
+            }
+        }
+
         if (errors.hasErrors() || (!password.equals(verifyPassword))) {
             model.addAttribute("title", "Try again");
             model.addAttribute(newUser);
