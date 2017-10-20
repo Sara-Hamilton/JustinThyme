@@ -51,10 +51,9 @@ public class MainController {
     @RequestMapping(value="/login", method = RequestMethod.GET)
     public String login(Model model) {
         model.addAttribute("title", "Log on in!");
-        //model.addAttribute(new User());
         return "/login";
     }
-    
+
     @RequestMapping(value="/login", method = RequestMethod.POST)
     public String login(Model model, @RequestParam String username, @RequestParam String password, HttpServletResponse response) {
 
@@ -63,13 +62,15 @@ public class MainController {
         for (User user : users) {
             if (user.getUsername().equals(username) && user.getPassword().equals(password)) {
                 model.addAttribute("user", user);
-                //TODO add cookie = ${username}
+                //add cookie called username
                 Cookie userCookie = new Cookie("username", user.getUsername());
+                // set cookie to expire in 1 hour
+                userCookie.setMaxAge(1 * 60 * 60);
                 response.addCookie(userCookie);
-                //TODO set loggedIn = 1;
+                //set loggedIn == 1(true) in database
                 user.setLoggedIn(true);
                 userDao.save(user);
-                //TODO set sessionID
+                //TODO set sessionID and cookie to something other than username for security
                 return "/welcome-user";
                }
                 else {
@@ -77,6 +78,31 @@ public class MainController {
             }
         }
         return "/login";
+    }
+
+    @RequestMapping(value="/logout", method = RequestMethod.GET)
+    public String logout(Model model) {
+        model.addAttribute("title", "Click here to Logout.");
+        return "/logout";
+    }
+
+    @RequestMapping(value="/logout", method = RequestMethod.POST)
+    public String logout(Model model, HttpServletResponse response) {
+        model.addAttribute("title", "See ya next Thyme!");
+        //Set loggedIn to false
+        Iterable<User> users = userDao.findAll();
+        for (User user: users) {
+            if (!(user.isLoggedIn() == true)) {
+                continue;
+            }
+            user.setLoggedIn(false);
+            userDao.save(user);
+        }
+        //Remove cookie
+        Cookie userCookie = new Cookie("username","");
+        userCookie.setMaxAge(0);
+        response.addCookie(userCookie);
+        return "/see-ya";
     }
 
 
@@ -91,7 +117,7 @@ public class MainController {
 
     @RequestMapping(value = "/signup", method = RequestMethod.POST)
     public String add(@ModelAttribute @Valid User newUser, Errors errors, Model model,
-                      String verifyPassword) {
+                      String verifyPassword, HttpServletResponse response) {
 
         String username = newUser.username;
         String password = newUser.getPassword();
@@ -106,7 +132,15 @@ public class MainController {
             }
             return "/signup";
         } else {
+            //add cookie called username
+            Cookie userCookie = new Cookie("username", username);
+            // set cookie to expire in 1 hour
+            userCookie.setMaxAge(1 * 60 * 60);
+            response.addCookie(userCookie);
+            //save new user to database
             userDao.save(newUser);
+            //set loggedIn == 1(true) in database
+            newUser.setLoggedIn(true);
             model.addAttribute("user", newUser);
             Seed.Area area = newUser.getArea();
             //Packet seeds = new Packet(newUser.getId(), seedDao.findByArea(area));
