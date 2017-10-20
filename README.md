@@ -1,5 +1,14 @@
 JustInThyme
 
+Installation: If you've not signed up for a trial account, do so now:
+https://www.twilio.com/try-twilio
+
+Include your new credentials at:
+TwilioSend.java, lines between 11&13, enter token information
+Phone number goes on line 23 
+
+Be sure to go to the application.properties file and change the port number to match the port number in your MAMP settings
+
 URL to the repo: https://github.com/JasonOnes/JustinThyme.git
 
 URL for wire-frames and page flows: https://tinyurl.com/yb5t8xl5
