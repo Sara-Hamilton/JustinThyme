@@ -17,14 +17,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.servlet.http.HttpSession;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Timer;
-import static com.JustinThyme.justinthymer.models.forms.Seed.Season.FALL;
-import static jdk.nashorn.internal.objects.NativeArray.length;
 
 
 @Controller
@@ -52,23 +51,34 @@ public class MainController {
     @RequestMapping(value="/login", method = RequestMethod.GET)
     public String login(Model model) {
         model.addAttribute("title", "Log on in!");
-        model.addAttribute(new User());
+        //model.addAttribute(new User());
         return "/login";
     }
-    // @ModelAttribute @Valid User user, Error errors
+    
     @RequestMapping(value="/login", method = RequestMethod.POST)
-    public String login(Model model, User user) {
-        User knownUser = userDao.findOne(user.getId());
-        // User knownUser = userDao.findOne(findByUsername());
+    public String login(Model model, @RequestParam String username, @RequestParam String password, HttpServletResponse response) {
 
-        if (user.getPassword() == knownUser.getPassword()) {
-            model.addAttribute("user", user);
-            return "/welcome-user";
-        } else {
-            model.addAttribute("title", "NO user by that name or incorrect password!");
-            return "/login";
+        model.addAttribute("users", userDao.findAll());
+        Iterable<User> users = userDao.findAll();
+        for (User user : users) {
+            if (user.getUsername().equals(username) && user.getPassword().equals(password)) {
+                model.addAttribute("user", user);
+                //TODO add cookie = ${username}
+                Cookie userCookie = new Cookie("username", user.getUsername());
+                response.addCookie(userCookie);
+                //TODO set loggedIn = 1;
+                user.setLoggedIn(true);
+                userDao.save(user);
+                //TODO set sessionID
+                return "/welcome-user";
+               }
+                else {
+                model.addAttribute("title", "No user by that name or incorrect password!");
+            }
         }
+        return "/login";
     }
+
 
 
     @RequestMapping(value = "/signup", method = RequestMethod.GET)
@@ -88,15 +98,11 @@ public class MainController {
         //newUser.checkPassword();
 
         if (errors.hasErrors() || (!password.equals(verifyPassword))) {
+            model.addAttribute("title", "Try again");
+            model.addAttribute(newUser);
+            model.addAttribute("areas", Seed.Area.values());
             if(password != "" && !password.equals(verifyPassword)) {
                 model.addAttribute("errorMessage", "Passwords do not match.");
-                model.addAttribute("title", "Try again");
-                model.addAttribute(newUser);
-                model.addAttribute("areas", Seed.Area.values());
-            } else if (password.equals(verifyPassword)){
-                model.addAttribute("title", "Try again");
-                model.addAttribute(newUser);
-                model.addAttribute("areas", Seed.Area.values());
             }
             return "/signup";
         } else {
