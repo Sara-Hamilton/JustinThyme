@@ -16,15 +16,16 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.thymeleaf.util.ListUtils;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Timer;
-
 
 @Controller
 @RequestMapping("JustinThyme")
@@ -194,20 +195,31 @@ public class MainController {
 
         String number = currentUser.getPhoneNumber();
         Timer timer = new Timer(true);
-
+        Seed.Area area = currentUser.getArea();
         //note below for informational purposes may try and use for current user functionality
         System.out.println("$$$$$$$$$$$$$$$$$" + session.getAttributeNames());
         System.out.println("@@@@@@@@@@" + session.getAttribute(currentUser.username));
+
+
         //loops through the user's seeds and set the update reminder for each
         for (Seed seed : aPacket.getSeeds()) {
-            String message = "It's time to plant " + seed.name;
-            Date date = seed.getPlantDate();
-            timer.schedule(new TwillTask.TwillReminder(message, number), date);
+
+            if (seed.getReminder() == true) {
+                String message = "It's time to plant " + seed.name;
+                Date date = seed.getPlantDate();
+                timer.schedule(new TwillTask.TwillReminder(message, number), date);
+            }
         }
+
+
+        List<Seed> notChosenSeeds = seedDao.findByArea(area);
+        notChosenSeeds.removeAll(aPacket.getSeeds());
+
 
         model.addAttribute("user", currentUser);
         model.addAttribute("packet", aPacket);
         model.addAttribute("seeds",aPacket.getSeeds());
+        model.addAttribute("seedsLeft", notChosenSeeds);
 
         return "/welcome-user";
 
@@ -217,6 +229,11 @@ public class MainController {
     @RequestMapping(value="/logout")
     public String whateverDisplay() {
         return "/logout";
+    }
+
+    @RequestMapping(value="/welcome-user-temp")
+    public String tempHolder() {
+        return "/welcome-user-temp";
     }
 
     @RequestMapping(value = "/unsubscribe")

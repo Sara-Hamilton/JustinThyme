@@ -20,10 +20,12 @@ public class JustinThymeRApplication {
 	@Bean
 	public CommandLineRunner trial(SeedDao seedDao) {
 		return(args) -> {
+
+			//			seedDao.save(new Seed("carrot", WESTCOAST, FALL, new Date(117, 9, 7, 19, 41)));
 			//note having trouble instantiating with default for reminder, so changed seed constructor
 			//note Date structure see notes in TwillController for details (year(-1900), month(-1), day, hour, minute)
 			//note in order not to repopulate Seed table run once then comment out below inputs
-//			seedDao.save(new Seed("carrot", WESTCOAST, FALL, new Date(117, 9, 7, 19, 41)));
+
 //			seedDao.save(new Seed("Corn", WESTCOAST, SPRING));
 //			seedDao.save(new Seed("Kale", WESTCOAST, FALL));
 //			seedDao.save(new Seed("Broccoli", WESTCOAST, SUMMER));
