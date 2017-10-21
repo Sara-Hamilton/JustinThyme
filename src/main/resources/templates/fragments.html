@@ -8,11 +8,38 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
 </head>
 <body>
-<nav th:fragment="navigation">
-    <a href="/JustinThyme/seed-edit">Edit Profile</a>|
-    <a href="/JustinThyme/welcome-user">Dashboard</a>|
-    <a href="/JustinThyme/logout">Logout</a>|
-    <a href="/JustinThyme/unsubscribe">Done</a>
+<nav th:fragment="navigation" class="navbar navbar-inverse navbar-static-top">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+
+            <a class="navbar-brand" href="#">JustinThyme</a>
+        </div>
+
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/JustinThyme/seed-edit">Edit Profile</a></li>
+                <li><a href="/JustinThyme/welcome-user">Dashboard</a></li>
+                <li><a href="/JustinThyme/logout">Logout</a></li>
+                <li><a href="/JustinThyme/unsubscribe">Done</a></li>
+
+            </ul>
+        </div>
+    </div>
 </nav>
+
+<div th:fragment="javascript">
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+</div>
+
 </body>
 </html>
