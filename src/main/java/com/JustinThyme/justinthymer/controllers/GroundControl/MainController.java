@@ -17,7 +17,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.servlet.http.HttpSession;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.Date;
@@ -50,23 +51,60 @@ public class MainController {
     @RequestMapping(value="/login", method = RequestMethod.GET)
     public String login(Model model) {
         model.addAttribute("title", "Log on in!");
-        model.addAttribute(new User());
         return "/login";
     }
-    // @ModelAttribute @Valid User user, Error errors
-    @RequestMapping(value="/login", method = RequestMethod.POST)
-    public String login(Model model, User user) {
-        User knownUser = userDao.findOne(user.getId());
-        // User knownUser = userDao.findOne(findByUsername());
 
-        if (user.getPassword() == knownUser.getPassword()) {
-            model.addAttribute("user", user);
-            return "/welcome-user";
-        } else {
-            model.addAttribute("title", "NO user by that name or incorrect password!");
-            return "/login";
+    @RequestMapping(value="/login", method = RequestMethod.POST)
+    public String login(Model model, @RequestParam String username, @RequestParam String password, HttpServletResponse response) {
+
+        model.addAttribute("users", userDao.findAll());
+        Iterable<User> users = userDao.findAll();
+        for (User user : users) {
+            if (user.getUsername().equals(username) && user.getPassword().equals(password)) {
+                model.addAttribute("user", user);
+                //add cookie called username
+                Cookie userCookie = new Cookie("username", user.getUsername());
+                // set cookie to expire in 1 hour
+                userCookie.setMaxAge(1 * 60 * 60);
+                response.addCookie(userCookie);
+                //set loggedIn == 1(true) in database
+                user.setLoggedIn(true);
+                userDao.save(user);
+                //TODO set sessionID and cookie to something other than username for security
+                return "/welcome-user";
+               }
+                else {
+                model.addAttribute("title", "No user by that name or incorrect password!");
+            }
         }
+        return "/login";
     }
+
+    @RequestMapping(value="/logout", method = RequestMethod.GET)
+    public String logout(Model model) {
+        model.addAttribute("title", "Click here to Logout.");
+        return "/logout";
+    }
+
+    @RequestMapping(value="/logout", method = RequestMethod.POST)
+    public String logout(Model model, HttpServletResponse response) {
+        model.addAttribute("title", "See ya next Thyme!");
+        //Set loggedIn to false
+        Iterable<User> users = userDao.findAll();
+        for (User user: users) {
+            if (!(user.isLoggedIn() == true)) {
+                continue;
+            }
+            user.setLoggedIn(false);
+            userDao.save(user);
+        }
+        //Remove cookie
+        Cookie userCookie = new Cookie("username","");
+        userCookie.setMaxAge(0);
+        response.addCookie(userCookie);
+        return "/see-ya";
+    }
+
 
 
     @RequestMapping(value = "/signup", method = RequestMethod.GET)
@@ -79,26 +117,42 @@ public class MainController {
 
     @RequestMapping(value = "/signup", method = RequestMethod.POST)
     public String add(@ModelAttribute @Valid User newUser, Errors errors, Model model,
-                      String verifyPassword) {
+                      String verifyPassword, HttpServletResponse response) {
 
         String username = newUser.username;
         String password = newUser.getPassword();
 
 
+        // username must be unique
+        Iterable<User> users = userDao.findAll();
+        for (User user : users) {
+            if (user.getUsername().equals(username)) {
+                model.addAttribute("title", "Try again");
+                model.addAttribute(newUser);
+                model.addAttribute("areas", Seed.Area.values());
+                model.addAttribute("userErrorMessage", "That username is taken.");
+                return "/signup";
+            }
+        }
+
         if (errors.hasErrors() || (!password.equals(verifyPassword))) {
+            model.addAttribute("title", "Try again");
+            model.addAttribute(newUser);
+            model.addAttribute("areas", Seed.Area.values());
             if(password != "" && !password.equals(verifyPassword)) {
                 model.addAttribute("errorMessage", "Passwords do not match.");
-                model.addAttribute("title", "Try again");
-                model.addAttribute(newUser);
-                model.addAttribute("areas", Seed.Area.values());
-            } else if (password.equals(verifyPassword)){
-                model.addAttribute("title", "Try again");
-                model.addAttribute(newUser);
-                model.addAttribute("areas", Seed.Area.values());
             }
             return "/signup";
         } else {
+            //add cookie called username
+            Cookie userCookie = new Cookie("username", username);
+            // set cookie to expire in 1 hour
+            userCookie.setMaxAge(1 * 60 * 60);
+            response.addCookie(userCookie);
+            //save new user to database
             userDao.save(newUser);
+            //set loggedIn == 1(true) in database
+            newUser.setLoggedIn(true);
             model.addAttribute("user", newUser);
             Seed.Area area = newUser.getArea();
             List<Seed> seeds = new ArrayList<>();

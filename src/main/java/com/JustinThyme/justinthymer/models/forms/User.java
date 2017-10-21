@@ -33,12 +33,19 @@ public class User {
     @NotNull
     private Seed.Area area;
 
+    private long sessionId;
 
-    public User(String username, String password, Seed.Area area, String phoneNumber) {
+    @NotNull
+    private boolean loggedIn;
+
+
+    public User(String username, String password, Seed.Area area, String phoneNumber, Long sessionId, Boolean loggedIn) {
         this.username = username;
         this.password = password;
         this.area = area;
         this.phoneNumber = phoneNumber;
+        this.sessionId = sessionId;
+        this.loggedIn = loggedIn;
 
     }
 
@@ -69,6 +76,22 @@ public class User {
 
     public void setArea(Seed.Area area) {
         this.area = area;
+    }
+
+    public long getSessionId() {
+        return sessionId;
+    }
+
+    public void setSessionId(long sessionId) {
+        this.sessionId = sessionId;
+    }
+
+    public boolean isLoggedIn() {
+        return loggedIn;
+    }
+
+    public void setLoggedIn(boolean loggedIn) {
+        this.loggedIn = loggedIn;
     }
 
 
