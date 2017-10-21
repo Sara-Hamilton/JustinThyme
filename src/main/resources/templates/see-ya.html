@@ -7,9 +7,10 @@
 <body>
 <nav th:replace="fragments :: navigation"></nav>
 
+
 <h1 th:text="${title}"></h1>
 
-<p><p>You have successfully logged out.</p></p>
-
+<div th:replace="fragments :: javascript"></div>
+  
 </body>
 </html>

@@ -1,16 +1,11 @@
 package com.JustinThyme.justinthymer.models.forms;
 
-import com.JustinThyme.justinthymer.models.forms.Packet;
-import com.JustinThyme.justinthymer.models.forms.Seed;
-
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
-import java.util.ArrayList;
 
 @Entity
 public class User {
@@ -31,11 +26,9 @@ public class User {
 
     //note NotNull ? or keep optional IF user wants updates
     //note needs to be string for twillio
+    //note something like this ?
+    //@Pattern(regexp="\([2-9][0-8][0-9]\)[2-9][0-9]{2}-[0-9]{4}", message="Not a valid number")
     private String phoneNumber;
-
-//    @JoinColumn(name = "user_id")
-//    private Packet packet;
-//    //public ArrayList<Packet> seeds;
 
     @NotNull
     private Seed.Area area;
@@ -108,21 +101,8 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
-        //checkPassword();
+
     }
-//    public String getVerifyPassword() {
-//        return verifyPassword;
-//    }
-//
-//    public void setVerifyPassword(String verifyPassword) {
-//        this.verifyPassword = verifyPassword;
-//        checkPassword();
-//    }
-//
-//
-//    public void checkPassword() {
-//        if (password!=null && verifyPassword!=null && !password.equals(verifyPassword)) {
-//            verifyPassword = null;
-//        }
+
     }
 

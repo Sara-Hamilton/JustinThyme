@@ -27,7 +27,7 @@
     <tr th:each="seed :${seeds}">
     <td th:text="${seed.name}"></td>
     <td th:text="${seed.plantDate}"></td>
-    <!--<td th:text="${seed.reminder}"></td>-->
+    <td th:text="${seed.reminder}"></td>
 
     </tr>
 
@@ -46,6 +46,6 @@
 <!--&lt;!&ndash;</tr>&ndash;&gt;-->
 
 
-
+<div th:replace="fragments :: javascript"></div>
 </body>
 </html>

@@ -121,7 +121,7 @@ public class MainController {
 
         String username = newUser.username;
         String password = newUser.getPassword();
-        //newUser.checkPassword();
+
 
         // username must be unique
         Iterable<User> users = userDao.findAll();
@@ -155,21 +155,18 @@ public class MainController {
             newUser.setLoggedIn(true);
             model.addAttribute("user", newUser);
             Seed.Area area = newUser.getArea();
-            //Packet seeds = new Packet(newUser.getId(), seedDao.findByArea(area));
             List<Seed> seeds = new ArrayList<>();
             seeds = seedDao.findByArea(area);
 
             model.addAttribute("seeds", seeds);
-            //return "/welcome-user";
-            //return "redirect:seed-edit";
             return "/seed-edit";
         }
     }
 
     @RequestMapping(value = "/seed-edit", method = RequestMethod.GET)
     public String showSeeds(Model model, User newUser) {
+
         Seed.Area area = newUser.getArea();
-        System.out.println("**********************" + newUser.getId());
         model.addAttribute(new Packet());
         model.addAttribute("seeds", seedDao.findByArea(area));
         model.addAttribute("user", newUser);
@@ -179,7 +176,7 @@ public class MainController {
 
 
     @RequestMapping(value = "/seed-edit", method = RequestMethod.POST)
-    public String seedListing(Model model, User newUser, @ModelAttribute Packet aPacket, @RequestParam int[] seedIds,
+    public String seedListing(HttpSession session, Model model, User newUser, @ModelAttribute Packet aPacket, @RequestParam int[] seedIds,
                               Integer userId) {
 
         //goes through list of chosen seeds and adds them to user's packet
@@ -195,15 +192,16 @@ public class MainController {
         User currentUser = userDao.findOne(userId);
 
 
-        String number = currentUser.getPhoneNumber(); ;//note will only work with my number for now
+        String number = currentUser.getPhoneNumber();
         Timer timer = new Timer(true);
 
+        //note below for informational purposes may try and use for current user functionality
+        System.out.println("$$$$$$$$$$$$$$$$$" + session.getAttributeNames());
+        System.out.println("@@@@@@@@@@" + session.getAttribute(currentUser.username));
+        //loops through the user's seeds and set the update reminder for each
         for (Seed seed : aPacket.getSeeds()) {
             String message = "It's time to plant " + seed.name;
             Date date = seed.getPlantDate();
-            System.out.println("+++++++++++" + seed.plantDate);
-            System.out.println(message);
-            System.out.println("=====================" + number);
             timer.schedule(new TwillTask.TwillReminder(message, number), date);
         }
 
@@ -216,7 +214,35 @@ public class MainController {
 
     }
 
+    @RequestMapping(value="/logout")
+    public String whateverDisplay() {
+        return "/logout";
+    }
 
+    @RequestMapping(value = "/unsubscribe")
+    public String displayConstruction() {
+        return "/unsubscribe";
+    }
+//    @RequestMapping(value = "/unsubscribe", method = RequestMethod.GET)
+//    public String displayUserToRemove(HttpSession session, Model model, @RequestParam int userId) {
+//        System.out.println(session.getAttributeNames());
+//        //model.addAttribute("user", userDao.getAll());
+//        model.addAttribute("title", "Sayonara!");
+//        return "unsubscribe";
+//    }
+//
+//    @RequestMapping(value = "/unsubscribe", method = RequestMethod.POST)
+//    public String processUserRemoval(@RequestParam int userId) {
+//
+//        User exUser = userDao.findById(userId);
+//        //Packet moldyPacket = packetDao.findByUserId(userId);
+//        //packetDao.delete(moldyPacket);
+//        userDao.delete(exUser);
+//
+//
+//
+//        return "redirect:";
+//    }
 
 
 

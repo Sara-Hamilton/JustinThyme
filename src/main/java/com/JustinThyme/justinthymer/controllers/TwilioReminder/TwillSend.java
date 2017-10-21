@@ -13,11 +13,16 @@ public class TwillSend {
     public static final String  AUTH_TOKEN = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
 
 
+
+
+
     public static void twill_away(String message, String number) {
         Twilio.init(ACCOUNT_SID, AUTH_TOKEN);
 
         Message twill_message = Message.creator(new PhoneNumber (number),//number to (receiving)
                 new PhoneNumber("XXXXXXXXXXX"),//number from (this will be your Twillio number)
+
+
                 message).create();//message from form and passed via model
 
         System.out.println(twill_message.getSid());
