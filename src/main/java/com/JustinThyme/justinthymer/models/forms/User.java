@@ -27,7 +27,8 @@ public class User {
     //note NotNull ? or keep optional IF user wants updates
     //note needs to be string for twillio
     //note something like this ?
-    //@Pattern(regexp="\([2-9][0-8][0-9]\)[2-9][0-9]{2}-[0-9]{4}", message="Not a valid number")
+    //@Pattern(regexp="([2-9][0-8][0-9])[2-9][0-9]{2}-[0-9]{4}", message="Not a valid number")
+    @Pattern(regexp = "[(][2-9][0-8][0-9][)][2-9][0-9]{2}-[0-9]{4}", message="Not a valid number, use (XXX)XXX-XXXX format")
     private String phoneNumber;
 
     @NotNull

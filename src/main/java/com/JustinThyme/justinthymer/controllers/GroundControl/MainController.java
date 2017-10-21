@@ -71,6 +71,7 @@ public class MainController {
                 //set loggedIn == 1(true) in database
                 user.setLoggedIn(true);
                 userDao.save(user);
+                model.addAttribute("seeds", seedDao.findByArea(user.getArea()));
                 //TODO set sessionID and cookie to something other than username for security
                 return "/welcome-user";
                }
