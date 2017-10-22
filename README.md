@@ -1,17 +1,22 @@
 JustInThyme
 
-Installation: If you've not signed up for a trial account, do so now:
-https://www.twilio.com/try-twilio
+Installation:
+If you've not signed up for a trial account, do so now by navigating to https://www.twilio.com/try-twilio
+Navigate to the Github repository linked below
+Clone the repository and load it in a text editor of your choice
+Edit the code base to include your Twilio credentials (TwilioSend.java, lines between 11&13, enter token information; phone number goes on line 23)
+Go to the application.properties file and change the port number to match the port number in your MAMP settings
+Be sure to start your Start your servers with MAMP
+Use Gradle to bootRun the application file
+Navigate your brower to localhost:8080/JustinThyme
+Have fun!
 
-Include your new credentials at:
-TwilioSend.java, lines between 11&13, enter token information
-Phone number goes on line 23 
-
-Be sure to go to the application.properties file and change the port number to match the port number in your MAMP settings
 
 URL to the repo: https://github.com/JasonOnes/JustinThyme.git
 
 URL for wire-frames and page flows: https://tinyurl.com/yb5t8xl5
+
+URL to the test plan: https://tinyurl.com/y8s46hhv
 
 The Elevator Pitch: It's a web app for people who want to know when to plant their seeds. It's useful for novice and intermediate growers alike. The novice user can use it to discover what seeds to grow in their region, and the intermediate user can use it to keep track of all the seeds they're storing away like squirrels.
 
