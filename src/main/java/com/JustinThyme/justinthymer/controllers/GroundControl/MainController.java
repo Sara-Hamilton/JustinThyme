@@ -197,10 +197,6 @@ public class MainController {
         String number = currentUser.getPhoneNumber();
         Timer timer = new Timer(true);
         Seed.Area area = currentUser.getArea();
-        //note below for informational purposes may try and use for current user functionality
-        System.out.println("$$$$$$$$$$$$$$$$$" + session.getAttributeNames());
-        System.out.println("@@@@@@@@@@" + session.getAttribute(currentUser.username));
-
 
         //loops through the user's seeds and set the update reminder for each
         for (Seed seed : aPacket.getSeeds()) {
@@ -227,10 +223,6 @@ public class MainController {
 
     }
 
-    @RequestMapping(value="/logout")
-    public String whateverDisplay() {
-        return "/logout";
-    }
 
     @RequestMapping(value="/welcome-user-temp")
     public String tempHolder() {
@@ -239,17 +231,18 @@ public class MainController {
 
     @RequestMapping(value = "/unsubscribe")
     public String displayConstruction() {
-        return "/unsubscribe";
+        return "/well-wishes";
     }
+
 //    @RequestMapping(value = "/unsubscribe", method = RequestMethod.GET)
 //    public String displayUserToRemove(HttpSession session, Model model, @RequestParam int userId) {
-//        System.out.println(session.getAttributeNames());
+//        //System.out.println(session.getAttributeNames());
 //        //model.addAttribute("user", userDao.getAll());
 //        model.addAttribute("title", "Sayonara!");
-//        return "unsubscribe";
+//        return "unsubscribe" + userId;
 //    }
 //
-//    @RequestMapping(value = "/unsubscribe", method = RequestMethod.POST)
+//    @RequestMapping(value = "/unsubscribe/<userId>", method = RequestMethod.POST)
 //    public String processUserRemoval(@RequestParam int userId) {
 //
 //        User exUser = userDao.findById(userId);
@@ -257,9 +250,7 @@ public class MainController {
 //        //packetDao.delete(moldyPacket);
 //        userDao.delete(exUser);
 //
-//
-//
-//        return "redirect:";
+//        return "/well-wishes";
 //    }
 
 
