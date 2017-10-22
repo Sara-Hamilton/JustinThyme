@@ -56,7 +56,7 @@ public class MainController {
     }
 
     @RequestMapping(value="/login", method = RequestMethod.POST)
-    public String login(Model model,Packet aPacket, @RequestParam String username, @RequestParam String password, HttpServletResponse response) {
+    public String login(Model model, @RequestParam String username, @RequestParam String password, HttpServletResponse response) {
 
         model.addAttribute("users", userDao.findAll());
         Iterable<User> users = userDao.findAll();
@@ -72,7 +72,6 @@ public class MainController {
                 user.setLoggedIn(true);
                 userDao.save(user);
                 model.addAttribute("seeds", seedDao.findByArea(user.getArea()));
-
                 //TODO set sessionID and cookie to something other than username for security
                 return "/welcome-user";
                }
@@ -82,8 +81,6 @@ public class MainController {
         }
         return "/login";
     }
-
-
 
     @RequestMapping(value="/logout", method = RequestMethod.GET)
     public String logout(Model model) {
@@ -225,23 +222,6 @@ public class MainController {
 
 
     }
-
-    @RequestMapping (value="/welcome-user", method = RequestMethod.GET)
-    public String welcomeLoginUser (Model model, User aUser, Packet aPacket){
-
-//        Packet aPacket = packetDao.findOne(aUser.getId());
-//        List<Seed> notChosenSeeds = seedDao.findByArea(aUser.getArea());
-//        notChosenSeeds.removeAll(aPacket.getSeeds());
-//
-//        Seed.Area area = aUser.getArea();
-
-        model.addAttribute("user", aUser);
-        model.addAttribute("seeds",aPacket.getSeeds());
-//        model.addAttribute("seedsLeft", seedDao.findByArea(area).removeAll(aPacket.getSeeds()));
-
-        return "/welcome-user";
-    }
-
 
 
     @RequestMapping(value="/welcome-user-temp")
