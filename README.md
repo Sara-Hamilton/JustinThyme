@@ -1,15 +1,7 @@
 JustInThyme
 
 Installation:
-If you've not signed up for a trial account, do so now by navigating to https://www.twilio.com/try-twilio
-Navigate to the Github repository linked below
-Clone the repository and load it in a text editor of your choice
-Edit the code base to include your Twilio credentials (TwilioSend.java, lines between 11&13, enter token information; phone number goes on line 23)
-Go to the application.properties file and change the port number to match the port number in your MAMP settings
-Be sure to start your Start your servers with MAMP
-Use Gradle to bootRun the application file
-Navigate your brower to localhost:8080/JustinThyme
-Have fun!
+If you've not signed up for a trial account, do so now by navigating to https://www.twilio.com/try-twilio. Navigate to the Github repository linked below. Clone the repository and load it in a text editor of your choice. Edit the code base to include your Twilio credentials (TwilioSend.java, lines between 11&13, enter token information; phone number goes on line 23). Go to the application.properties file and change the port number to match the port number in your MAMP settings. Be sure to start your Start your servers with MAMP. Use Gradle to bootRun the application file. Navigate your brower to localhost:8080/JustinThyme. Have fun!
 
 
 URL to the repo: https://github.com/JasonOnes/JustinThyme.git
