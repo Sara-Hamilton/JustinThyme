@@ -188,10 +188,10 @@ public class MainController {
             aPacket.setReminder(seedToPlant);//note turns reminder on for all seeds in this sprint
         }
 
-
-        aPacket.setUser_id(userId);
-        packetDao.save(aPacket);
         User currentUser = userDao.findOne(userId);
+        aPacket.setUser(currentUser);
+        packetDao.save(aPacket);
+
 
 
         String number = currentUser.getPhoneNumber();
