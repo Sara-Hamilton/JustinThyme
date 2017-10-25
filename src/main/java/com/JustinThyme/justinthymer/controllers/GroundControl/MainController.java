@@ -2,11 +2,12 @@ package com.JustinThyme.justinthymer.controllers.GroundControl;
 
 
 import com.JustinThyme.justinthymer.controllers.TwilioReminder.TwillTask;
+import com.JustinThyme.justinthymer.models.converters.PacketSeedToSeed;
 import com.JustinThyme.justinthymer.models.data.PacketDao;
 import com.JustinThyme.justinthymer.models.data.SeedDao;
 import com.JustinThyme.justinthymer.models.data.SeedInPacketDao;
 import com.JustinThyme.justinthymer.models.data.UserDao;
-import com.JustinThyme.justinthymer.models.factories.SeedToPacketSeed;
+import com.JustinThyme.justinthymer.models.converters.SeedToPacketSeed;
 import com.JustinThyme.justinthymer.models.forms.Packet;
 import com.JustinThyme.justinthymer.models.forms.Seed;
 import com.JustinThyme.justinthymer.models.forms.SeedInPacket;
@@ -19,7 +20,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.thymeleaf.util.ListUtils;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
@@ -71,7 +71,7 @@ public class MainController {
     @RequestMapping(value="/login", method = RequestMethod.POST)
     public String login(Model model, @RequestParam String username, @RequestParam String password, HttpServletResponse response) {
 
-        model.addAttribute("users", userDao.findAll());
+        //model.addAttribute("users", userDao.findAll());
         Iterable<User> users = userDao.findAll();
         for (User user : users) {
             if (user.getUsername().equals(username) && user.getPassword().equals(password)) {
@@ -83,13 +83,31 @@ public class MainController {
                 response.addCookie(userCookie);
                 //set loggedIn == 1(true) in database
                 user.setLoggedIn(true);
-                //note should userDao save user here???
                 userDao.save(user);
                 // gets the packet associated with that user for display
                 Packet userPacket = packetDao.findByUserId(user.getId());
-                System.out.println("HERE:::::" + userPacket.getSeeds());
-                //model.addAttribute("seeds", seedDao.findByArea(user.getArea()));
+
+                //makes a list of seeds not picked for display from list of seesInPacket
+                List<Seed> seedsToRemove = new ArrayList<>();
+                for (SeedInPacket seedInPacket : userPacket.getSeeds()) {
+                    Seed aSeed = PacketSeedToSeed.fromPackToSeed(seedInPacket);
+                    seedsToRemove.add(aSeed);
+                }
+
+                for (Seed seed : seedsToRemove ) {
+                    System.out.println("!!!!!!!!" + seed.name);
+                }
+                List<Seed> seedsLeft = seedDao.findByArea(user.getArea());
+                seedsLeft.removeAll(seedsToRemove);
+
+                //TODO Not sure why seesToRemove aren't being removed SEE line 256
+                for  (Seed seed : seedsLeft) {
+                    System.out.println("&&&&&&&&&&&" + seed.name);
+                }
+
+
                 model.addAttribute("seeds", userPacket.getSeeds());
+                model.addAttribute("seedsLeft", seedsLeft);
                 //TODO set sessionID and cookie to something other than username for security
                 return "/welcome-user";
                }
@@ -206,60 +224,50 @@ public class MainController {
         User currentUser = userDao.findOne(userId);
         newPacket.setUser(currentUser);
         packetDao.save(newPacket);
-
+        //2 lists, 1 needed for packet and another to remove Seeds from display list
+        //because you cannot remove seedsInPacket from seedDao
         List<SeedInPacket> seedsToPlant = new ArrayList<>();
+        List<Seed> pickedSeedsAsSeeds = new ArrayList<>();
 
         //goes through list of chosen seeds and adds them to user's packet and sets reminder
         for (int seedId : seedIds) {
             Seed seedPicked = seedDao.findOne(seedId);
-           // SeedInPacket seedToPlant = (SeedInPacket) seedDao.findOne(seedId);
+            pickedSeedsAsSeeds.add(seedPicked);
+
             //note conversion using factory
             SeedInPacket seedToPlant = SeedToPacketSeed.fromSeedToPacket(seedPicked, newPacket);
             seedToPlant.setReminder(seedToPlant);
-            System.out.println("^^^^^^^^^^" + seedToPlant.name);
-            System.out.println(":::::::::" + seedToPlant.getClass());
-            System.out.println("@@@@@@@@@" + seedToPlant.getPacket());
-            System.out.println(">>>>>>>>>>>" + newPacket.getId());
-            System.out.println("<<<<<<<<<<<" + newPacket.getUser());
             seedsToPlant.add(seedToPlant);
-            //newPacket.addSeed(seedToPlant);
             seedInPacketDao.save(seedToPlant);
 
-        //note turns reminder on for all seeds in this sprint
         }
 
-        //after all seeds have been converted, turned on then set to packet
+        //after all seeds have been converted and reminder turned on, set to packet
         newPacket.setSeeds(seedsToPlant);
 
 
+        //below needed for TwilioTask
         String number = currentUser.getPhoneNumber();
-        Timer timer = new Timer(true);
+        Timer timer = new Timer(true); //daemon set to true
+
+        //needed for display
         Seed.Area area = currentUser.getArea();
-
         List<Seed> notChosenSeeds = seedDao.findByArea(area);
-        notChosenSeeds.removeAll(newPacket.getSeeds());
+        notChosenSeeds.removeAll(pickedSeedsAsSeeds);
 
 
-        //loops through the user's seeds and set the update reminder for each
+        //loops through the user's seeds and starts the update for each
         for (SeedInPacket seed : newPacket.getSeeds()) {
 
             if (seed.getReminder() == true) {
                 String message = "It's time to plant " + seed.name;
                 Date date = seed.getPlantDate();
-                System.out.println("%%" + seed.name + ":" + seed.getPlantDate());
                 timer.schedule(new TwillTask.TwillReminder(message, number), date);
             }
         }
 
-        //Packet usersPacket = packetDao.findByUserId(currentUser.getId());
 
-       // notChosenSeeds.removeAll(usersPacket.getSeeds());
-
-
-        //Packet somePacket = packetDao.findByUserId(currentUser.getId());
         model.addAttribute("user", currentUser);
-        model.addAttribute("packet", newPacket);
-        //model.addAttribute("seeds", aPacket.getSeeds());
         model.addAttribute("seeds", newPacket.getSeeds());
         model.addAttribute("seedsLeft", notChosenSeeds);
 

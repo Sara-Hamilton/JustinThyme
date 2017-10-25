@@ -1,4 +1,4 @@
-package com.JustinThyme.justinthymer.models.factories;
+package com.JustinThyme.justinthymer.models.converters;
 
 import com.JustinThyme.justinthymer.models.forms.Packet;
 import com.JustinThyme.justinthymer.models.forms.Seed;

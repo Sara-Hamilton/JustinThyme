@@ -24,6 +24,11 @@ public class SeedInPacket extends Seed {
         this.reminder = false;
     }
 
+    public SeedInPacket() {
+
+    }
+
+
     public Boolean getReminder() {
         return reminder;
     }
