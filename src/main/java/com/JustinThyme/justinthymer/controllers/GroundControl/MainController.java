@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.thymeleaf.util.ListUtils;
 
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
@@ -56,7 +57,7 @@ public class MainController {
     }
 
     @RequestMapping(value="/login", method = RequestMethod.POST)
-    public String login(Model model, @RequestParam String username, @RequestParam String password, HttpServletResponse response) {
+    public String login(Model model, @RequestParam String username, @RequestParam String password, HttpServletResponse response, HttpServletRequest request) {
 
         model.addAttribute("users", userDao.findAll());
         Iterable<User> users = userDao.findAll();
@@ -70,6 +71,17 @@ public class MainController {
                 response.addCookie(userCookie);
                 //set loggedIn == 1(true) in database
                 user.setLoggedIn(true);
+                //get sessionID
+                Cookie[] cookies = request.getCookies();
+                String sessionId = "";
+                for (Cookie cookie : cookies) {
+                    if (cookie.getName().equals("JSESSIONID")) {
+                        sessionId = cookie.getValue();
+                    }
+                }
+                //set sessionId in database
+                user.setSessionId(sessionId);
+                //save changes to database
                 userDao.save(user);
                 model.addAttribute("seeds", seedDao.findByArea(user.getArea()));
                 //TODO set sessionID and cookie to something other than username for security
