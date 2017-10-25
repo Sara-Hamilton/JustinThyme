@@ -1,16 +1,21 @@
 package com.JustinThyme.justinthymer.models.data;
 
+
 import com.JustinThyme.justinthymer.models.forms.Packet;
-import com.JustinThyme.justinthymer.models.forms.User;
+import com.JustinThyme.justinthymer.models.forms.Seed;
+import com.JustinThyme.justinthymer.models.forms.SeedInPacket;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
-
+import java.util.List;
 
 @Repository
 @Transactional
-public interface PacketDao extends CrudRepository<Packet, Integer> {
+public interface SeedInPacketDao extends CrudRepository<Seed, Integer> {
 
-    Packet findByUserId(int user_id);
+    List<SeedInPacket> getByPacket(Packet aPacket);
+
+
+
 }

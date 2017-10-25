@@ -4,9 +4,12 @@ package com.JustinThyme.justinthymer.controllers.GroundControl;
 import com.JustinThyme.justinthymer.controllers.TwilioReminder.TwillTask;
 import com.JustinThyme.justinthymer.models.data.PacketDao;
 import com.JustinThyme.justinthymer.models.data.SeedDao;
+import com.JustinThyme.justinthymer.models.data.SeedInPacketDao;
 import com.JustinThyme.justinthymer.models.data.UserDao;
+import com.JustinThyme.justinthymer.models.factories.SeedToPacketSeed;
 import com.JustinThyme.justinthymer.models.forms.Packet;
 import com.JustinThyme.justinthymer.models.forms.Seed;
+import com.JustinThyme.justinthymer.models.forms.SeedInPacket;
 import com.JustinThyme.justinthymer.models.forms.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -27,6 +30,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Timer;
 
+//import  org.springframework.security.crypto.password;
+//import BCryptPasswordEncoder;
+//import org.mindrot.jbcrypt.BCrypt;
+
 @Controller
 @RequestMapping("JustinThyme")
 public class MainController {
@@ -39,6 +46,12 @@ public class MainController {
 
     @Autowired
     private PacketDao packetDao;
+
+    @Autowired
+    private SeedInPacketDao seedInPacketDao;
+
+//    @Autowired
+//    private BCryptPasswordEncoder passwordEncoder;
 
 
     @RequestMapping(value="")
@@ -70,8 +83,13 @@ public class MainController {
                 response.addCookie(userCookie);
                 //set loggedIn == 1(true) in database
                 user.setLoggedIn(true);
+                //note should userDao save user here???
                 userDao.save(user);
-                model.addAttribute("seeds", seedDao.findByArea(user.getArea()));
+                // gets the packet associated with that user for display
+                Packet userPacket = packetDao.findByUserId(user.getId());
+                System.out.println("HERE:::::" + userPacket.getSeeds());
+                //model.addAttribute("seeds", seedDao.findByArea(user.getArea()));
+                model.addAttribute("seeds", userPacket.getSeeds());
                 //TODO set sessionID and cookie to something other than username for security
                 return "/welcome-user";
                }
@@ -124,6 +142,9 @@ public class MainController {
         String username = newUser.username;
         String password = newUser.getPassword();
 
+
+//        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+//        String hashedPassword = passwordEncoder.encode(password);
 
         // username must be unique
         Iterable<User> users = userDao.findAll();
@@ -178,44 +199,68 @@ public class MainController {
 
 
     @RequestMapping(value = "/seed-edit", method = RequestMethod.POST)
-    public String seedListing(HttpSession session, Model model, User newUser, @ModelAttribute Packet aPacket, @RequestParam int[] seedIds,
+    public String seedListing(HttpSession session, Model model, @RequestParam int[] seedIds,
                               Integer userId) {
 
-        //goes through list of chosen seeds and adds them to user's packet
+        Packet newPacket = new Packet();
+        User currentUser = userDao.findOne(userId);
+        newPacket.setUser(currentUser);
+        packetDao.save(newPacket);
+
+        List<SeedInPacket> seedsToPlant = new ArrayList<>();
+
+        //goes through list of chosen seeds and adds them to user's packet and sets reminder
         for (int seedId : seedIds) {
-            Seed seedToPlant = seedDao.findOne(seedId);
-            aPacket.addSeed(seedToPlant);
-            aPacket.setReminder(seedToPlant);//note turns reminder on for all seeds in this sprint
+            Seed seedPicked = seedDao.findOne(seedId);
+           // SeedInPacket seedToPlant = (SeedInPacket) seedDao.findOne(seedId);
+            //note conversion using factory
+            SeedInPacket seedToPlant = SeedToPacketSeed.fromSeedToPacket(seedPicked, newPacket);
+            seedToPlant.setReminder(seedToPlant);
+            System.out.println("^^^^^^^^^^" + seedToPlant.name);
+            System.out.println(":::::::::" + seedToPlant.getClass());
+            System.out.println("@@@@@@@@@" + seedToPlant.getPacket());
+            System.out.println(">>>>>>>>>>>" + newPacket.getId());
+            System.out.println("<<<<<<<<<<<" + newPacket.getUser());
+            seedsToPlant.add(seedToPlant);
+            //newPacket.addSeed(seedToPlant);
+            seedInPacketDao.save(seedToPlant);
+
+        //note turns reminder on for all seeds in this sprint
         }
 
-
-        aPacket.setUser_id(userId);
-        packetDao.save(aPacket);
-        User currentUser = userDao.findOne(userId);
+        //after all seeds have been converted, turned on then set to packet
+        newPacket.setSeeds(seedsToPlant);
 
 
         String number = currentUser.getPhoneNumber();
         Timer timer = new Timer(true);
         Seed.Area area = currentUser.getArea();
 
+        List<Seed> notChosenSeeds = seedDao.findByArea(area);
+        notChosenSeeds.removeAll(newPacket.getSeeds());
+
+
         //loops through the user's seeds and set the update reminder for each
-        for (Seed seed : aPacket.getSeeds()) {
+        for (SeedInPacket seed : newPacket.getSeeds()) {
 
             if (seed.getReminder() == true) {
                 String message = "It's time to plant " + seed.name;
                 Date date = seed.getPlantDate();
+                System.out.println("%%" + seed.name + ":" + seed.getPlantDate());
                 timer.schedule(new TwillTask.TwillReminder(message, number), date);
             }
         }
 
+        //Packet usersPacket = packetDao.findByUserId(currentUser.getId());
 
-        List<Seed> notChosenSeeds = seedDao.findByArea(area);
-        notChosenSeeds.removeAll(aPacket.getSeeds());
+       // notChosenSeeds.removeAll(usersPacket.getSeeds());
 
 
+        //Packet somePacket = packetDao.findByUserId(currentUser.getId());
         model.addAttribute("user", currentUser);
-        model.addAttribute("packet", aPacket);
-        model.addAttribute("seeds",aPacket.getSeeds());
+        model.addAttribute("packet", newPacket);
+        //model.addAttribute("seeds", aPacket.getSeeds());
+        model.addAttribute("seeds", newPacket.getSeeds());
         model.addAttribute("seedsLeft", notChosenSeeds);
 
         return "/welcome-user";
@@ -224,8 +269,18 @@ public class MainController {
     }
 
 
+    @RequestMapping(value="/welcome-user", method=RequestMethod.POST)
+    public String welcomeDisplay(HttpSession session, Model model, User loggedUser, @ModelAttribute Packet aPacket,
+                                 @RequestParam int[] seedIds, Integer userId) {
+        aPacket = packetDao.findOne(userId);
+
+        model.addAttribute("user", loggedUser);
+        model.addAttribute("seeds", aPacket.getSeeds());
+        return "/welcome-user";
+    }
+
     @RequestMapping(value="/welcome-user-temp")
-    public String tempHolder() {
+        public String tempHolder() {
         return "/welcome-user-temp";
     }
 

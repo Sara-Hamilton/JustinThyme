@@ -1,8 +1,6 @@
 package com.JustinThyme.justinthymer.models.forms;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
@@ -14,6 +12,10 @@ public class User {
     @GeneratedValue
     private int id;
 
+
+    @OneToOne(mappedBy = "user")
+    private Packet packet;
+
     @NotNull
     //regex pattern prevents empty string but allows spaces within the string
     @Pattern(regexp="(.|\\s)*\\S(.|\\s)*", message="Name must not be empty.")
@@ -23,11 +25,7 @@ public class User {
     @Size(min=6, message="Passwords must be at least six characters.")
     private String password;
 
-
-    //note NotNull ? or keep optional IF user wants updates
-    //note needs to be string for twillio
-    //note something like this ?
-    //@Pattern(regexp="([2-9][0-8][0-9])[2-9][0-9]{2}-[0-9]{4}", message="Not a valid number")
+   // classic phone number pattern, North American numbers
     @Pattern(regexp = "[(][2-9][0-8][0-9][)][2-9][0-9]{2}-[0-9]{4}", message="Not a valid number, use (XXX)XXX-XXXX format")
     private String phoneNumber;
 
@@ -105,5 +103,9 @@ public class User {
 
     }
 
+    public Packet getPacket() {
+        return packet;
     }
+
+}
 
