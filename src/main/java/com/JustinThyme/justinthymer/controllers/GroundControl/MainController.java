@@ -40,7 +40,6 @@ public class MainController {
     @Autowired
     private PacketDao packetDao;
 
-
     @RequestMapping(value="")
     public String splash(Model model) {
 
@@ -106,8 +105,6 @@ public class MainController {
         response.addCookie(userCookie);
         return "/see-ya";
     }
-
-
 
     @RequestMapping(value = "/signup", method = RequestMethod.GET)
     public String add(Model model) {
@@ -175,8 +172,6 @@ public class MainController {
         return "/seed-edit";
     }
 
-
-
     @RequestMapping(value = "/seed-edit", method = RequestMethod.POST)
     public String seedListing(HttpSession session, Model model, User newUser, @ModelAttribute Packet aPacket, @RequestParam int[] seedIds,
                               Integer userId) {
@@ -223,6 +218,28 @@ public class MainController {
 
     }
 
+
+    @RequestMapping(value = "/edit-profile", method = RequestMethod.GET)
+    public String editProfilePreferences() {
+        // display form with relevant options
+            // change your area?
+            // change your cell phone
+            // change your email address
+            // change your password
+
+        return "/edit-profile";
+    }
+
+    @RequestMapping(value = "/edit-profile", method = RequestMethod.POST)
+    public String saveChangesToProfilePreferences() {
+
+        //process form, capture all user input into fields
+        //make operative changes upon user's information in the database
+        //update changes to user in database, save AND commit to it
+        //return the same page with the update information displayed
+
+        return "/edit-profile";
+    }
 
     @RequestMapping(value="/welcome-user-temp")
     public String tempHolder() {
