@@ -94,18 +94,26 @@ public class MainController {
                     seedsToRemove.add(aSeed);
                 }
 
+//
+                List<Seed> seedsLeft = seedDao.findByArea(user.getArea());
                 for (Seed seed : seedsToRemove ) {
+                    seedsLeft.remove(seed);
                     System.out.println("!!!!!!!!" + seed.name);
                 }
-                List<Seed> seedsLeft = seedDao.findByArea(user.getArea());
-                seedsLeft.removeAll(seedsToRemove);
 
-                //TODO Not sure why seesToRemove aren't being removed SEE line 256
+                //seedsLeft.removeAll(seedsToRemove);
+                System.out.println("++++++++++" + seedsLeft);
+                System.out.println("-----------" + seedsToRemove);
+                seedsLeft.removeAll(seedsToRemove);
+                System.out.println("===========" + seedsLeft);
+
+                //TODO Not sure why seesToRemove aren't being removed SEE note @line 260
+                //note Problem MUST be at PacketSeedToSeed conversion!!
                 for  (Seed seed : seedsLeft) {
                     System.out.println("&&&&&&&&&&&" + seed.name);
                 }
 
-
+                model.addAttribute("title", "Testing seed removal");
                 model.addAttribute("seeds", userPacket.getSeeds());
                 model.addAttribute("seedsLeft", seedsLeft);
                 //TODO set sessionID and cookie to something other than username for security
@@ -250,7 +258,7 @@ public class MainController {
         String number = currentUser.getPhoneNumber();
         Timer timer = new Timer(true); //daemon set to true
 
-        //needed for display
+        //needed for display note see above @108
         Seed.Area area = currentUser.getArea();
         List<Seed> notChosenSeeds = seedDao.findByArea(area);
         notChosenSeeds.removeAll(pickedSeedsAsSeeds);
