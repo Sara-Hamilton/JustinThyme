@@ -25,4 +25,20 @@ public class UserData {
             return aUser;
 
         }
+
+    //getByUsername
+    public static User getByUsername(String username) {
+        User aUser = null;
+
+        for (User someUser : users) {
+            if (someUser.getUsername() == username) {
+                aUser = someUser;
+            }
+        }
+
+        return aUser;
+
+    }
+
+
 }
