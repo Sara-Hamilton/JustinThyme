@@ -2,7 +2,6 @@ package com.JustinThyme.justinthymer.controllers.GroundControl;
 
 
 import com.JustinThyme.justinthymer.controllers.TwilioReminder.TwillTask;
-import com.JustinThyme.justinthymer.models.converters.PacketSeedToSeed;
 import com.JustinThyme.justinthymer.models.data.PacketDao;
 import com.JustinThyme.justinthymer.models.data.SeedDao;
 import com.JustinThyme.justinthymer.models.data.SeedInPacketDao;
@@ -99,37 +98,25 @@ public class MainController {
                 // gets the packet associated with that user for display
                 Packet userPacket = packetDao.findByUserId(user.getId());
 
-                //makes a list of seeds not picked for display from list of seesInPacket
+                //makes a list of seeds not picked for display from list of seedsInPacket
                 List<Seed> seedsToRemove = new ArrayList<>();
                 for (SeedInPacket seedInPacket : userPacket.getSeeds()) {
-                    Seed aSeed = PacketSeedToSeed.fromPackToSeed(seedInPacket);
-                    seedsToRemove.add(aSeed);
+                    String name = seedInPacket.getName();
+                    List<Seed> aSeed = seedDao.findByName(name);
+                    // note returns a list of all the seeds with that name, not most efficient but it works
+                    seedsToRemove.addAll(aSeed);
                 }
 
-//
+
+
                 List<Seed> seedsLeft = seedDao.findByArea(user.getArea());
-                for (Seed seed : seedsToRemove ) {
-                    seedsLeft.remove(seed);
-                    System.out.println("!!!!!!!!" + seed.name);
-                }
-
-                //seedsLeft.removeAll(seedsToRemove);
-                System.out.println("++++++++++" + seedsLeft);
-                System.out.println("-----------" + seedsToRemove);
                 seedsLeft.removeAll(seedsToRemove);
-                System.out.println("===========" + seedsLeft);
 
-                //TODO Not sure why seesToRemove aren't being removed SEE note @line 260
-                //note Problem MUST be at PacketSeedToSeed conversion!!
-                for  (Seed seed : seedsLeft) {
-                    System.out.println("&&&&&&&&&&&" + seed.name);
-                }
+                //note seedsLeft will be Seed objects and seeds will be SeedInPacket
 
                 model.addAttribute("title", "Testing seed removal");
                 model.addAttribute("seeds", userPacket.getSeeds());
                 model.addAttribute("seedsLeft", seedsLeft);
-              
-                //TODO set sessionID and cookie to something other than username for security
               
                 return "/welcome-user";
                }

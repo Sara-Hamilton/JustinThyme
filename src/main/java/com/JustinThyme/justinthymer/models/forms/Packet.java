@@ -12,12 +12,6 @@ public class Packet {
     private int id;
 
     @OneToOne
-    @JoinColumn(name = "user_id")
-    private User user;
-
-
-
-    @OneToOne
     @JoinColumn(name="user_id")
     private User user;
 
@@ -63,13 +57,13 @@ public class Packet {
         return seeds;
     }
 
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
+//    public User getUser() {
+//        return user;
+//    }
+//
+//    public void setUser(User user) {
+//        this.user = user;
+//    }
 
     public void setSeeds(List<SeedInPacket> seeds) {
         this.seeds = seeds;
