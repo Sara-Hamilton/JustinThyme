@@ -1,6 +1,8 @@
 package com.JustinThyme.justinthymer.models.forms;
 
+
 import javax.persistence.*;
+
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
@@ -25,7 +27,12 @@ public class User {
     @Size(min=6, message="Passwords must be at least six characters.")
     private String password;
 
-   // classic phone number pattern, North American numbers
+
+    @OneToOne(mappedBy = "user")
+    private Packet packet;
+
+    // standard phone number format for North America
+>
     @Pattern(regexp = "[(][2-9][0-8][0-9][)][2-9][0-9]{2}-[0-9]{4}", message="Not a valid number, use (XXX)XXX-XXXX format")
     private String phoneNumber;
 

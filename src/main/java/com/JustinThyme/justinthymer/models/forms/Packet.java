@@ -17,6 +17,12 @@ public class Packet {
 
 
 
+    @OneToOne
+    @JoinColumn(name="user_id")
+    private User user;
+
+
+
     public int getId() {
         return id;
     }
@@ -35,6 +41,7 @@ public class Packet {
     public Packet(Integer user_id, List<SeedInPacket> seeds) {
     }
 
+
     public Packet() {
     }
 
@@ -42,6 +49,14 @@ public class Packet {
     public int getPacketId() {
         return id;
     }
+//    public int getUser_id() {
+//        return user_id;
+//    }
+//
+//    public void setUser_id(Integer user_id) {
+//        this.user_id = user_id;
+//    }
+
 
 
     public List<SeedInPacket> getSeeds() {
@@ -69,5 +84,19 @@ public class Packet {
     }
 
 
+    public void setReminder(Seed aSeed) {
+        aSeed.reminder = true;
+    }
+    public void removeReminder(Seed aSeed) {
+        aSeed.reminder = false;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
 
 }
