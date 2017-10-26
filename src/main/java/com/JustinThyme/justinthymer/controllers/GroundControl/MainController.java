@@ -8,17 +8,18 @@ import com.JustinThyme.justinthymer.models.data.UserDao;
 import com.JustinThyme.justinthymer.models.forms.Packet;
 import com.JustinThyme.justinthymer.models.forms.Seed;
 import com.JustinThyme.justinthymer.models.forms.User;
+import com.JustinThyme.justinthymer.models.forms.UserData;
+import com.oracle.jrockit.jfr.ValueDefinition;
+import org.apache.http.protocol.HTTP;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.thymeleaf.util.ListUtils;
 
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
@@ -29,6 +30,7 @@ import java.util.Timer;
 
 @Controller
 @RequestMapping("JustinThyme")
+@SessionAttributes("username")
 public class MainController {
 
     @Autowired
@@ -39,6 +41,9 @@ public class MainController {
 
     @Autowired
     private PacketDao packetDao;
+
+    @Autowired
+    private HttpSession httpSession;
 
     @RequestMapping(value="")
     public String splash(Model model) {
@@ -72,6 +77,7 @@ public class MainController {
                 userDao.save(user);
                 model.addAttribute("seeds", seedDao.findByArea(user.getArea()));
                 //TODO set sessionID and cookie to something other than username for security
+                httpSession.setAttribute("user_id", user.getId());
                 return "/welcome-user";
                }
                 else {
@@ -157,6 +163,9 @@ public class MainController {
             List<Seed> seeds = new ArrayList<>();
             seeds = seedDao.findByArea(area);
 
+            //use http session to create session object with name user_id
+            httpSession.setAttribute("user_id", newUser.getId());
+
             model.addAttribute("seeds", seeds);
             return "/seed-edit";
         }
@@ -220,25 +229,60 @@ public class MainController {
 
 
     @RequestMapping(value = "/edit-profile", method = RequestMethod.GET)
-    public String editProfilePreferences() {
+    public String editProfilePreferences(Model model) {
         // display form with relevant options
-            // change your area?
-            // change your cell phone
-            // change your email address
-            // change your password
+        // change your area?
+        // change your cell phone
+        // change your password
 
-        return "/edit-profile";
+       Integer userId = (Integer) httpSession.getAttribute("user_id");
+       User aUser = userDao.findById(userId);
+
+        if (userId != 0) {
+            model.addAttribute("user", aUser);
+            model.addAttribute("areas", Seed.Area.values());
+            model.addAttribute("title", "Editing Preferences for " + aUser.username);
+            return "/edit-profile";
+        } else {
+            //if no current user, redirect to splash page
+            //nothing to edit if user is not logged in
+            model.addAttribute("title", "Welcome to JustinThyme");
+            return "splash";
+        }
     }
 
     @RequestMapping(value = "/edit-profile", method = RequestMethod.POST)
-    public String saveChangesToProfilePreferences() {
+    public String saveChangesToProfilePreferences(@ModelAttribute @Valid User updatedUser, Errors errors, Model model) {
 
         //process form, capture all user input into fields
         //make operative changes upon user's information in the database
         //update changes to user in database, save AND commit to it
         //return the same page with the update information displayed
 
-        return "/edit-profile";
+        Integer userId = (Integer) httpSession.getAttribute("user_id");
+        User aUser = userDao.findById(userId);
+
+        if (errors.hasErrors()) {
+            model.addAttribute("user", aUser);
+            model.addAttribute("areas", Seed.Area.values());
+            model.addAttribute("title", "Editing Preferences for " + aUser.username);
+            return "/edit-profile";
+        } else {
+            //SAVE CHANGED INFO
+
+            //take user form session, and use validated fields to take new values
+            aUser.setPhoneNumber(updatedUser.getPhoneNumber());
+            aUser.setArea(updatedUser.getArea());
+            aUser.setPassword(updatedUser.getPassword());
+
+            userDao.save(aUser);
+
+            model.addAttribute("user", aUser);
+            model.addAttribute("areas", Seed.Area.values());
+            model.addAttribute("title", "Editing Preferences for " + aUser.username);
+            return "/edit-profile";
+        }
+
     }
 
     @RequestMapping(value="/welcome-user-temp")
