@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
@@ -69,21 +70,32 @@ public class MainController {
     }
 
     @RequestMapping(value="/login", method = RequestMethod.POST)
-    public String login(Model model, @RequestParam String username, @RequestParam String password, HttpServletResponse response) {
+    public String login(Model model, @RequestParam String username, @RequestParam String password, HttpServletResponse response, HttpServletRequest request) {
 
         //model.addAttribute("users", userDao.findAll());
         Iterable<User> users = userDao.findAll();
         for (User user : users) {
             if (user.getUsername().equals(username) && user.getPassword().equals(password)) {
                 model.addAttribute("user", user);
-                //add cookie called username
-                Cookie userCookie = new Cookie("username", user.getUsername());
-                // set cookie to expire in 1 hour
-                userCookie.setMaxAge(1 * 60 * 60);
-                response.addCookie(userCookie);
-                //set loggedIn == 1(true) in database
-                user.setLoggedIn(true);
+                // add user to session
+                request.getSession().setAttribute("user", user);
+
+                // create and set cookie for username
+                Cookie usernameCookie = new Cookie("username", username);
+                usernameCookie.setMaxAge(60 * 60);
+                response.addCookie(usernameCookie);
+
+                // create and set cookie for sessionId
+                long sessionID = (long)(Math.random() * 1000000);
+                String sessionId = String.valueOf(sessionID);
+                Cookie sessionIdCookie = new Cookie("sessionId", sessionId);
+                sessionIdCookie.setMaxAge(60 * 60);
+                response.addCookie(sessionIdCookie);
+
+                // save data to database
+                user.setSessionId(sessionId);
                 userDao.save(user);
+              
                 // gets the packet associated with that user for display
                 Packet userPacket = packetDao.findByUserId(user.getId());
 
@@ -116,7 +128,9 @@ public class MainController {
                 model.addAttribute("title", "Testing seed removal");
                 model.addAttribute("seeds", userPacket.getSeeds());
                 model.addAttribute("seedsLeft", seedsLeft);
+              
                 //TODO set sessionID and cookie to something other than username for security
+              
                 return "/welcome-user";
                }
                 else {
@@ -133,21 +147,34 @@ public class MainController {
     }
 
     @RequestMapping(value="/logout", method = RequestMethod.POST)
-    public String logout(Model model, HttpServletResponse response) {
+    public String logout(Model model, HttpServletResponse response, HttpServletRequest request) {
         model.addAttribute("title", "See ya next Thyme!");
-        //Set loggedIn to false
-        Iterable<User> users = userDao.findAll();
-        for (User user: users) {
-            if (!(user.isLoggedIn() == true)) {
-                continue;
+
+        // Remove sessionId from database
+        Cookie[] cookies = request.getCookies();
+        for(Cookie cookie : cookies) {
+            if ("sessionId".equals(cookie.getName())) {
+                String sessionId = cookie.getValue();
+
+                Iterable<User> users = userDao.findAll();
+                for (User user : users) {
+                    if (user.getSessionId().equals(sessionId)) {
+                        user.setSessionId("");
+                        userDao.save(user);
+                    }
+                }
             }
-            user.setLoggedIn(false);
-            userDao.save(user);
         }
-        //Remove cookie
-        Cookie userCookie = new Cookie("username","");
+
+        //Remove cookies
+        Cookie userCookie = new Cookie("username", "");
+        Cookie sessionIdCookie = new Cookie("sessionId", "");
         userCookie.setMaxAge(0);
+        sessionIdCookie.setMaxAge(0);
         response.addCookie(userCookie);
+        response.addCookie(sessionIdCookie);
+        request.getSession().removeAttribute("user");
+
         return "/see-ya";
     }
 
@@ -163,14 +190,16 @@ public class MainController {
 
     @RequestMapping(value = "/signup", method = RequestMethod.POST)
     public String add(@ModelAttribute @Valid User newUser, Errors errors, Model model,
-                      String verifyPassword, HttpServletResponse response) {
+                      String verifyPassword, HttpServletResponse response, HttpServletRequest request) {
 
         String username = newUser.username;
         String password = newUser.getPassword();
 
 
+
 //        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 //        String hashedPassword = passwordEncoder.encode(password);
+
 
         // username must be unique
         Iterable<User> users = userDao.findAll();
@@ -193,27 +222,35 @@ public class MainController {
             }
             return "/signup";
         } else {
-            //add cookie called username
-            Cookie userCookie = new Cookie("username", username);
-            // set cookie to expire in 1 hour
-            userCookie.setMaxAge(1 * 60 * 60);
-            response.addCookie(userCookie);
-            //save new user to database
+            // create and set cookie for username
+            Cookie usernameCookie = new Cookie("username", username);
+            usernameCookie.setMaxAge(60 * 60);
+            response.addCookie(usernameCookie);
+
+            // create and set cookie for sessionId
+            long sessionID = (long)(Math.random() * 1000000);
+            String sessionId = String.valueOf(sessionID);
+            Cookie sessionIdCookie = new Cookie("sessionId", sessionId);
+            sessionIdCookie.setMaxAge(60 * 60);
+            response.addCookie(sessionIdCookie);
+
+            // save data to database
+            newUser.setSessionId(sessionId);
             userDao.save(newUser);
-            //set loggedIn == 1(true) in database
-            newUser.setLoggedIn(true);
+
             model.addAttribute("user", newUser);
             Seed.Area area = newUser.getArea();
             List<Seed> seeds = new ArrayList<>();
             seeds = seedDao.findByArea(area);
 
+            request.getSession().setAttribute("user", newUser);
             model.addAttribute("seeds", seeds);
             return "/seed-edit";
         }
     }
 
     @RequestMapping(value = "/seed-edit", method = RequestMethod.GET)
-    public String showSeeds(Model model, User newUser) {
+    public String showSeeds(Model model, User newUser, HttpServletRequest request) {
 
         Seed.Area area = newUser.getArea();
         model.addAttribute(new Packet());
@@ -296,7 +333,14 @@ public class MainController {
     }
 
     @RequestMapping(value="/welcome-user-temp")
-        public String tempHolder() {
+
+    public String tempHolder(Model model, HttpServletRequest request) {
+        User user = (User)request.getSession().getAttribute("user");
+        if(user == null){
+            model.addAttribute("title", "Login");
+            return "/splash";
+        }
+
         return "/welcome-user-temp";
     }
 
