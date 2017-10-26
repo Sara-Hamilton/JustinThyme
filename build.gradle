@@ -9,6 +9,7 @@ buildscript {
 	dependencies {
 		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
 		classpath ("org.junit.platform:junit-platform-gradle-plugin:1.0.1")
+		//classpath("org.springframework.security.crypto.password;")
 	}
 }
 
@@ -27,6 +28,7 @@ repositories {
 
 
 dependencies {
+	//compile('org.springframework.security.crypto.password')
 	compile group: "com.twilio.sdk", name: "twilio", version: "7.11.+"
 	compile('org.springframework.boot:spring-boot-starter-data-jpa')
 	compile('mysql:mysql-connector-java')

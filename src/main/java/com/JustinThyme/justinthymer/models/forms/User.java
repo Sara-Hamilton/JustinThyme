@@ -1,9 +1,8 @@
 package com.JustinThyme.justinthymer.models.forms;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
+
+import javax.persistence.*;
+
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
@@ -15,6 +14,10 @@ public class User {
     @Id
     @GeneratedValue
     private int id;
+
+
+    @OneToOne(mappedBy = "user")
+    private Packet packet;
 
     @NotNull
     //regex pattern prevents empty string but allows spaces within the string
@@ -30,6 +33,7 @@ public class User {
     private Packet packet;
 
     // standard phone number format for North America
+>
     @Pattern(regexp = "[(][2-9][0-8][0-9][)][2-9][0-9]{2}-[0-9]{4}", message="Not a valid number, use (XXX)XXX-XXXX format")
     private String phoneNumber;
 
@@ -91,5 +95,9 @@ public class User {
         this.password = password;
     }
 
+    public Packet getPacket() {
+        return packet;
     }
+
+}
 
