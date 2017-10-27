@@ -32,11 +32,19 @@
 
 </table>
 
-<h3>Here are some more seeds that grow in your area:</h3>
-<ul th:each="seed: ${seedsLeft}">
-    <li th:text="${seed.name}"></li>
 
-</ul>
+<form method="post" action = "welcome-user">
+    <h3>Here are some more seeds that grow in your area:</h3>
+    <ul th:each="seed : ${seedsLeft}">
+
+        <li><input th:text="${seed.name}" type="checkbox" name="seedIds" th:value="${seed.getId()}"/></li>
+    </ul>
+    <input type="hidden" th:value="${user.getId()}" name="userId" />
+    <input type="submit" value ="Add more"/>
+
+
+</form>
+
 
 
 <div th:replace="fragments :: javascript"></div>

@@ -303,28 +303,100 @@ public class MainController {
 
     }
 
+//
+//    @RequestMapping(value = "/welcome-user", method = RequestMethod.POST)
+//    public String welcomeDisplay(HttpSession session, Model model, User loggedUser, @ModelAttribute Packet aPacket,
+//                                 @RequestParam int[] seedIds, Integer userId) {
+//        aPacket = packetDao.findOne(userId);
+//
+//        model.addAttribute("user", loggedUser);
+//        model.addAttribute("seeds", aPacket.getSeeds());
+//        return "/welcome-user";
+//    }
 
-    @RequestMapping(value = "/welcome-user", method = RequestMethod.POST)
-    public String welcomeDisplay(HttpSession session, Model model, User loggedUser, @ModelAttribute Packet aPacket,
-                                 @RequestParam int[] seedIds, Integer userId) {
-        aPacket = packetDao.findOne(userId);
+//
+//    @RequestMapping(value = "/welcome-user-temp")
+//
+//    public String tempHolder(Model model, HttpServletRequest request) {
+//        User user = (User) request.getSession().getAttribute("user");
+//        if (user == null) {
+//            model.addAttribute("title", "Login");
+//            return "/splash";
+//        }
+//
+//        return "/welcome-user-temp";
+//    }
 
-        model.addAttribute("user", loggedUser);
-        model.addAttribute("seeds", aPacket.getSeeds());
+    @RequestMapping(value ="/welcome-user", method =RequestMethod.GET)
+    public String dashboard (Model model, HttpServletRequest request){
+        User user = (User)request.getSession().getAttribute("user");
+
+//        if user is not logged in, sent back to splash page
+        if(user == null){
+            model.addAttribute("title", "Login");
+            return "/splash";
+        } else{
+            Packet aPacket = packetDao.findByUserId(user.getId());
+
+            List<Seed> seedsToRemove = new ArrayList<>();
+            for (SeedInPacket seedInPacket : aPacket.getSeeds()) {
+                String name = seedInPacket.getName();
+                List<Seed> aSeed = seedDao.findByName(name);
+                seedsToRemove.addAll(aSeed);
+            }
+
+            List<Seed> notChosenSeeds = seedDao.findByArea(user.getArea());
+            notChosenSeeds.removeAll(seedsToRemove);
+
+            model.addAttribute("user", user);
+            model.addAttribute("seeds", aPacket.getSeeds());
+            model.addAttribute("seedsLeft", notChosenSeeds);
+        }
         return "/welcome-user";
     }
 
-    @RequestMapping(value = "/welcome-user-temp")
+    @RequestMapping (value ="/welcome-user", method = RequestMethod.POST)
+    public String dashboardAdd (Model model , @RequestParam int[] seedIds, Integer userId){
 
-    public String tempHolder(Model model, HttpServletRequest request) {
-        User user = (User) request.getSession().getAttribute("user");
-        if (user == null) {
-            model.addAttribute("title", "Login");
-            return "/splash";
+
+        Packet aPacket = packetDao.findByUserId(userId);
+
+        List<SeedInPacket> seedsToPlant = new ArrayList<>();
+        List<Seed> pickedSeedsAsSeeds = new ArrayList<>();
+
+        //add selected seed to seedInPacketDao
+        for (int seedId : seedIds) {
+            Seed seedPicked = seedDao.findOne(seedId);
+            pickedSeedsAsSeeds.add(seedPicked);
+
+            SeedInPacket seedToPlant = SeedToPacketSeed.fromSeedToPacket(seedPicked, aPacket);
+            seedToPlant.setReminder(seedToPlant);
+            seedsToPlant.add(seedToPlant);
+            seedInPacketDao.save(seedToPlant);
         }
 
-        return "/welcome-user-temp";
+        User user = userDao.findOne(userId);
+
+        //get seedname from user's seedInPacket
+        List<Seed> seedsToRemove = new ArrayList<>();
+        for (SeedInPacket seedInPacket : aPacket.getSeeds()) {
+            String name = seedInPacket.getName();
+            List<Seed> aSeed = seedDao.findByName(name);
+            seedsToRemove.addAll(aSeed);
+        }
+
+        List<Seed> seedsLeft = seedDao.findByArea(user.getArea());
+        seedsLeft.removeAll(seedsToRemove);
+
+        model.addAttribute("user", user);
+        model.addAttribute("seeds", aPacket.getSeeds());
+        model.addAttribute("seedsLeft",seedsLeft );
+
+        return "/welcome-user";
     }
+
+
+
 
     @RequestMapping(value = "/unsubscribe", method = RequestMethod.GET)
     public String displayUserToRemove(Model model) {
