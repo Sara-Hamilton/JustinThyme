@@ -12,10 +12,13 @@ import java.util.List;
 
 @Repository
 @Transactional
-public interface SeedInPacketDao extends CrudRepository<Seed, Integer> {
+public interface SeedInPacketDao extends CrudRepository<SeedInPacket, Integer> {
 
     List<SeedInPacket> getByPacket(Packet aPacket);
 
+    List<SeedInPacket> findAll();
+
+    //List<SeedInPacket> findAll();
 
 
 }
