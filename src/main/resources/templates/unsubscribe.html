@@ -7,12 +7,13 @@
 <body>
 <nav th:replace="fragments :: navigation"></nav>
 
+<div class="container-fluid">
+    <h1>Do you really want to unsubscribe?</h1>
 
-<h1>Do you really want to unsubscribe?</h1>
-
-<form method="post" style="max-width:600px;">
-    <input type="submit" value="While signing up for this service is the best decision of my life I must with a heavy heart unsubscirbe."/>
-</form>
+    <form method="post">
+        <input type="submit" class="btn btn-sm btn-primary" value="Do you really want to unsubscribe?"/>
+    </form>
+</div>
 
 
 

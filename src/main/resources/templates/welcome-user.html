@@ -9,34 +9,37 @@
 
 <nav th:replace="fragments :: navigation"></nav>
 
-<h1 th:text="|Welcome ${user.username}|">Default welcome</h1>
+
+<div class="container-fluid">
+    <h1 th:text="|Welcome ${user.username}|">Default welcome</h1>
 
 
-<h2>Here are the contents of your seed packet:</h2>
-<table class="table">
-    <tr>
-        <th>Name</th>
-        <th>Plant Date</th>
-        <th>Reminder</th>
-    </tr>
+    <h2>Here are the contents of your seed packet:</h2>
+    <table class="table">
+        <tr>
+            <th>Name</th>
+            <th>Plant Date</th>
+            <th>Reminder</th>
+        </tr>
 
 
-    <tr th:each="seed :${seeds}">
-    <td th:text="${seed.name}"></td>
-    <td th:text="${seed.plantDate}"></td>
+        <tr th:each="seed :${seeds}">
+        <td th:text="${seed.name}"></td>
+        <td th:text="${seed.plantDate}"></td>
 
-    <td th:if="${seed.getReminder() == true}" th:text="ON"></td>
-    <td th:if="${seed.getReminder() == false}" th:text="OFF"></td>
+        <td th:if="${seed.getReminder() == true}" th:text="ON"></td>
+        <td th:if="${seed.getReminder() == false}" th:text="OFF"></td>
 
-    </tr>
+        </tr>
 
-</table>
+    </table>
 
-<h3>Here are some more seeds that grow in your area:</h3>
-<ul th:each="seed: ${seedsLeft}">
-    <li th:text="${seed.name}"></li>
+    <h3>Here are some more seeds that grow in your area:</h3>
+    <ul th:each="seed: ${seedsLeft}">
+        <li th:text="${seed.name}"></li>
 
-</ul>
+    </ul>
+</div>
 
 
 <div th:replace="fragments :: javascript"></div>

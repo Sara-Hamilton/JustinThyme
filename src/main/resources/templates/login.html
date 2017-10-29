@@ -8,23 +8,29 @@
 
 <nav th:replace="fragments :: navigation"></nav>
 
-<h1 th:text="${title}"></h1>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-4 col-lg-offset-4">
+            <h1 th:text="${title}"></h1>
 
-<form method="post" style="max-width:600px;" th:object="${user}">
-    <div class="form-group">
-        <label name="username">Username</label>
-        <input class="form-control" type="text" name="username"/>
-        <span class="error"></span>
+            <form method="post" th:object="${user}">
+                <div class="form-group">
+                    <label name="username">Username</label>
+                    <input class="form-control" type="text" name="username"/>
+                    <span class="error"></span>
+                </div>
+
+                <div class="form-group">
+                    <label name="password">Password</label>
+                    <input class="form-control" type="password" name="password"/>
+                    <span class="error"></span>
+                </div>
+
+                <input type="submit" class="btn btn-sm btn-primary" value="Submit"/>
+            </form>
+        </div>
     </div>
-
-    <div class="form-group">
-        <label name="password">Password</label>
-        <input class="form-control" type="password" name="password"/>
-        <span class="error"></span>
-    </div>
-
-    <input type="submit" value="Submit"/>
-</form>
+</div>
 
 <div th:replace="fragments :: javascript"></div>
 </body>

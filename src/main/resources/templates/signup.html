@@ -9,46 +9,52 @@
 
 <nav th:replace="fragments :: navigation"></nav>
 
-<h1 th:text="${title}"></h1>
+<div class="container-fluid">
+    <div class="row">
+                    <div class="col-lg-4 col-lg-offset-4">
+            <h1 th:text="${title}"></h1>
 
-<form method="post" style="max-width:600px;" th:object="${user}">
-    <div class="form-group">
-        <label th:for="username">Username</label>
-        <input class="form-control" th:field="*{username}" type="text" />
-        <span th:errors="*{username}" class="error"></span>
-        <span th:text="${userErrorMessage}"></span>
+            <form method="post" th:object="${user}">
+                <div class="form-group">
+                    <label th:for="username">Username</label>
+                    <input class="form-control" th:field="*{username}" type="text" />
+                    <span th:errors="*{username}" class="error"></span>
+                    <span th:text="${userErrorMessage}"></span>
+                </div>
+
+                <div class="form-group">
+                    <label th:for="password">Password</label>
+                    <input class="form-control" th:field="*{password}" type="password"/>
+                    <span th:errors="*{password}" class="error"></span>
+                </div>
+
+                <div class="form-group">
+                    <label th:for="verifyPassword">Verify Password</label>
+                    <input class="form-control" name="verifyPassword" type="password"/>
+                    <span th:text="${errorMessage}"></span>
+                </div>
+
+                <div class="form-group">
+                    <label th:for="phoneNumber">Phone Number</label>
+                    <input class="form-control" th:field="*{phoneNumber}" type="text" />
+                    <span th:errors="*{phoneNumber}" class="error"></span>
+                </div>
+
+                <div class="form-group">
+                    <label th:for="area">Area</label>
+                    <select th:field="*{area}">
+                        <option th:each="area : ${areas}"
+                                th:text="${area.name}"
+                                th:value="${area}"></option>
+                    </select>
+                    <span th:errors="*{area}" class="error"></span>
+                </div>
+
+                <input type="submit" class="btn btn-sm btn-primary" value="Submit"/>
+            </form>
+        </div>
     </div>
-
-    <div class="form-group">
-        <label th:for="password">Password</label>
-        <input class="form-control" th:field="*{password}" type="password"/>
-        <span th:errors="*{password}" class="error"></span>
-    </div>
-
-    <div class="form-group">
-        <label th:for="verifyPassword">Verify Password</label>
-        <input class="form-control" name="verifyPassword" type="password"/>
-        <span th:text="${errorMessage}"></span>
-    </div>
-
-    <div class="form-group">
-        <label th:for="phoneNumber">Phone Number</label>
-        <input class="form-control" th:field="*{phoneNumber}" type="text" />
-        <span th:errors="*{phoneNumber}" class="error"></span>
-    </div>
-
-    <div class="form-group">
-        <label th:for="area">Area</label>
-        <select th:field="*{area}">
-            <option th:each="area : ${areas}"
-                    th:text="${area.name}"
-                    th:value="${area}"></option>
-        </select>
-        <span th:errors="*{area}" class="error"></span>
-    </div>
-
-    <input type="submit" value="Submit"/>
-</form>
+</div>
 
 <div th:replace="fragments :: javascript"></div>
 </body>

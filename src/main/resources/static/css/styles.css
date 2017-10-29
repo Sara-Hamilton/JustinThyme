@@ -1,3 +1,5 @@
+@import url("//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css");
+
 .navbar-inverse {
 background-color:#2dcf5a;
 border-color:#2dcf5a;
@@ -11,6 +13,16 @@ text-shadow:none;
 .navbar .nav > li > a:hover, .navbar .nav > li, .navbar-inverse .navbar-brand:hover {
 color:#233930;
 text-shadow:none;
+}
+
+.navbar-inverse .navbar-toggle.collapsed, .navbar-inverse .navbar-toggle{
+border-color:white;
+}
+
+.navbar-inverse .navbar-toggle.collapsed:hover, .navbar-inverse .navbar-toggle:hover,
+.navbar-inverse .navbar-toggle.collapsed:focus, .navbar-inverse .navbar-toggle:focus{
+border-color:#233930;
+background-color:#233930;
 }
 
 .hero-image {
@@ -42,11 +54,47 @@ position: relative;
 .hero-text > #btn-splash{
     background-color:#2dcf5a;
     color:white;
-    border-style:none;}
+    border-style:none;
+    }
 
 .hero-text > #btn-splash:hover{
     background-color:white;
-    color:#2dcf5a;}
+    color:#2dcf5a;
+    }
+
+.error {
+    color: #f44336;
+    font-weight:bold;
+}
+
+.btn.btn-primary.btn-sm {
+    background-color:#2dcf5a;
+    border:0;
+}
+
+.btn.btn-primary.btn-sm:hover {
+    background-color:#233930;
+    border:0;
+}
+
+input[type=checkbox] {
+    opacity:0;
+}
+
+input[type=checkbox]+label:before{
+    font-family:FontAwesome;
+    display:inline-block;
+    letter-spacing:10px;
+}
+
+input[type=checkbox] + label:before {
+    content: "\f06c";
+    color:#c8ce9b;
+}
+
+input[type=checkbox]:checked + label:before {
+    color:#2dcf5a;
+}
 
 
 
