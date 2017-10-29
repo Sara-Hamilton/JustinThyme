@@ -2,6 +2,8 @@ package com.JustinThyme.justinthymer.controllers.GroundControl;
 
 
 import com.JustinThyme.justinthymer.controllers.TwilioReminder.TwillTask;
+import com.JustinThyme.justinthymer.models.converters.HashPass;
+
 import com.JustinThyme.justinthymer.models.data.PacketDao;
 import com.JustinThyme.justinthymer.models.data.SeedDao;
 import com.JustinThyme.justinthymer.models.data.SeedInPacketDao;
@@ -25,14 +27,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Timer;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
-//import  org.springframework.security.crypto.password;
-//import BCryptPasswordEncoder;
-//import org.mindrot.jbcrypt.BCrypt;
 
 @Controller
 @RequestMapping("JustinThyme")
@@ -180,8 +177,22 @@ public class MainController {
         String password = newUser.getPassword();
 
 
-//        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-//        String hashedPassword = passwordEncoder.encode(password);
+        String passwordString = newUser.getPassword();
+        //takes string and converts to an array of chars
+        char[] passwordChars = passwordString.toCharArray();
+        //creates an array of 32 random bytes for salting the hash
+        byte[] salt = new byte[32];
+        new Random().nextBytes(salt);
+
+
+       // passes char[] of password, salt, iterating twice, using 256 keylength(safe according to OWASP)
+        HashPass hashedPassword = new HashPass(passwordChars, salt, 2, 256);
+        //below puts back into String for User table
+        System.out.println("@@@HASHED PASSWORD::  " + hashedPassword);
+        //note even thought the HashPass class returns an array of bytes below doesn't work
+        //String reStrungPassword = new String(hashedPassword, StandardCharsets.UTF_8);
+
+        //TODO convert User table to save HashPass password instead of String password
 
 
         // username must be unique
@@ -216,6 +227,7 @@ public class MainController {
             Cookie sessionIdCookie = new Cookie("sessionId", sessionId);
             sessionIdCookie.setMaxAge(60 * 60);
             response.addCookie(sessionIdCookie);
+
 
             // save data to database
             newUser.setSessionId(sessionId);
@@ -303,29 +315,6 @@ public class MainController {
 
     }
 
-//
-//    @RequestMapping(value = "/welcome-user", method = RequestMethod.POST)
-//    public String welcomeDisplay(HttpSession session, Model model, User loggedUser, @ModelAttribute Packet aPacket,
-//                                 @RequestParam int[] seedIds, Integer userId) {
-//        aPacket = packetDao.findOne(userId);
-//
-//        model.addAttribute("user", loggedUser);
-//        model.addAttribute("seeds", aPacket.getSeeds());
-//        return "/welcome-user";
-//    }
-
-//
-//    @RequestMapping(value = "/welcome-user-temp")
-//
-//    public String tempHolder(Model model, HttpServletRequest request) {
-//        User user = (User) request.getSession().getAttribute("user");
-//        if (user == null) {
-//            model.addAttribute("title", "Login");
-//            return "/splash";
-//        }
-//
-//        return "/welcome-user-temp";
-//    }
 
     @RequestMapping(value ="/welcome-user", method =RequestMethod.GET)
     public String dashboard (Model model, HttpServletRequest request){
@@ -435,6 +424,11 @@ public class MainController {
 
             }
         }
+
+    @RequestMapping(value="edit-profile")
+    public String tempPlaceHolder() {
+        return "/edit-profile";
+    }
 
     }
 
