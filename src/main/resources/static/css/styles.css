@@ -96,6 +96,18 @@ input[type=checkbox]:checked + label:before {
     color:#2dcf5a;
 }
 
+ul.leaf {
+    list-style-type:none;
+    }
+
+
+ul.leaf:before {
+    font-family:FontAwesome;
+    content:"\f06c";
+    float:left;
+    width:1.4em;
+}
+
 
 
 
