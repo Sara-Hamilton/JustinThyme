@@ -110,6 +110,7 @@ public class MainController {
 
                 //note seedsLeft will be Seed objects and seeds will be SeedInPacket
 
+                model.addAttribute("user", user);
                 model.addAttribute("title", "Testing seed removal");
                 model.addAttribute("seeds", userPacket.getSeeds());
                 model.addAttribute("seedsLeft", seedsLeft);
@@ -345,7 +346,10 @@ public class MainController {
     }
 
     @RequestMapping (value ="/welcome-user", method = RequestMethod.POST)
-    public String dashboardAdd (Model model , @RequestParam int[] seedIds, Integer userId){
+    public String dashboardAdd (Model model , @RequestParam(required = false)int[] seedToRemoveIds,
+                                @RequestParam(required = false)int[] seedIds,
+                                @RequestParam Integer userId){
+
 
 
         Packet aPacket = packetDao.findByUserId(userId);
@@ -353,15 +357,29 @@ public class MainController {
         List<SeedInPacket> seedsToPlant = new ArrayList<>();
         List<Seed> pickedSeedsAsSeeds = new ArrayList<>();
 
-        //add selected seed to seedInPacketDao
-        for (int seedId : seedIds) {
-            Seed seedPicked = seedDao.findOne(seedId);
-            pickedSeedsAsSeeds.add(seedPicked);
 
-            SeedInPacket seedToPlant = SeedToPacketSeed.fromSeedToPacket(seedPicked, aPacket);
-            seedToPlant.setReminder(seedToPlant);
-            seedsToPlant.add(seedToPlant);
-            seedInPacketDao.save(seedToPlant);
+
+        //remove seeds from packet if they are selected
+        //for (int seedToRemoveId : seedToRemoveIds) {
+            if (seedToRemoveIds != null) {
+                for (int id : seedToRemoveIds) {
+                    SeedInPacket seedToGo = seedInPacketDao.findById(id);
+                    seedInPacketDao.delete(seedToGo);
+                }
+            }
+
+
+        //add selected seed to seedInPacketDao
+        if (seedIds != null) {
+            for (int seedId : seedIds) {
+                Seed seedPicked = seedDao.findOne(seedId);
+                pickedSeedsAsSeeds.add(seedPicked);
+
+                SeedInPacket seedToPlant = SeedToPacketSeed.fromSeedToPacket(seedPicked, aPacket);
+                seedToPlant.setReminder(seedToPlant);
+                seedsToPlant.add(seedToPlant);
+                seedInPacketDao.save(seedToPlant);
+            }
         }
 
         User user = userDao.findOne(userId);
@@ -373,6 +391,8 @@ public class MainController {
             List<Seed> aSeed = seedDao.findByName(name);
             seedsToRemove.addAll(aSeed);
         }
+
+        //TODO put if conditional to removeReminder form seedInPacket from radio button in form
 
         List<Seed> seedsLeft = seedDao.findByArea(user.getArea());
         seedsLeft.removeAll(seedsToRemove);

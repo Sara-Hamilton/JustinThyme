@@ -20,16 +20,23 @@
         <th>Reminder</th>
     </tr>
 
+    <form method="post" action="welcome-user">
 
     <tr th:each="seed :${seeds}">
-    <td th:text="${seed.name}"></td>
+    <!--<td th:text="${seed.name}" type="checkbox" name="seedToRemoveIds" th:value="${seed.getId()}"></td>-->
+        <td th:text="${seed.name}"></td>
     <td th:text="${seed.plantDate}"></td>
 
     <td th:if="${seed.getReminder() == true}" th:text="ON"></td>
     <td th:if="${seed.getReminder() == false}" th:text="OFF"></td>
+        <td><input type="submit" name="seedToRemoveIds" th:value="${seed.getId()}"/></td>
+        <!--<td><input type="submit" name="seedToRemoveIds" value="Remove"/></td>-->
 
     </tr>
 
+        <input type="hidden" th:value="${user.getId()}" name="userId" />
+
+    </form>
 </table>
 
 

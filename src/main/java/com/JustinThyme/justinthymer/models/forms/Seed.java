@@ -10,7 +10,7 @@ import java.util.List;
 
 @Entity
 public class Seed {
-
+//TODO before production change all id values to long
     @Id
     @GeneratedValue
     public int id;
@@ -92,6 +92,7 @@ public class Seed {
     public void setName(String name) {
         this.name = name;
     }
+
 
     public Area getArea() {
         return area;

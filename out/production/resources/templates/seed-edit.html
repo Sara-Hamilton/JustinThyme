@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleag.org/">
+<html lang="en" xmlns:th="http://www.thymeleaf.org/">
 
 <head th:replace="fragments :: head">
 
@@ -7,5 +7,22 @@
 
 <body>
 
+<nav th:replace="fragments :: navigation"></nav>
+
+<h1 th:text="|Hey ${user.username}, here's a list of seeds that grow in you're area: |">seeds</h1>
+
+<form method="post" action="seed-edit">
+    <p>Check what seeds you like and we will automatically send you updates!</p>
+<ul th:each="seed : ${seeds}">
+
+        <li><input th:text="${seed.name}" type="checkbox" name="seedIds" th:value="${seed.getId()}"/></li>
+    </ul>
+
+    <input type="hidden" th:value="${user.getId()}" name="userId" />
+    <input type="submit" value="Seed" />
+
+</form>
+
+<div th:replace="fragments :: javascript"></div>
 </body>
 </html>
