@@ -10,8 +10,16 @@
 <nav th:replace="fragments :: navigation"></nav>
 
 
-<div class="container-fluid">
+<!--<div class="container-fluid" >-->
     <h1 th:text="|Welcome ${user.username}|">Default welcome</h1>
+<table class="table">
+
+
+    <tr>
+        <th>Name</th>
+        <th>Plant Date</th>
+        <th>Reminder</th>
+    </tr>
 
     <form method="post" action="welcome-user">
 
@@ -22,29 +30,29 @@
 
     <td th:if="${seed.getReminder() == true}" th:text="ON"></td>
     <td th:if="${seed.getReminder() == false}" th:text="OFF"></td>
-        <td><input type="submit" name="seedToRemoveIds" th:value="${seed.getId()}"/></td>
+        <td><button type="submit" name="seedToRemoveIds" th:value="${seed.getId()}">Remove</button></td>
         <!--<td><input type="submit" name="seedToRemoveIds" value="Remove"/></td>-->
 
-        <td th:if="${seed.getReminder() == true}" th:text="ON"></td>
-        <td th:if="${seed.getReminder() == false}" th:text="OFF"></td>
 
         <input type="hidden" th:value="${user.getId()}" name="userId" />
-
+    </tr>
     </form>
 </table>
 
 
 <form method="post" action = "welcome-user">
     <h3>Here are some more seeds that grow in your area:</h3>
-    <ul class="leaf" th:each="seed : ${seedsLeft}">
+    <ul th:each="seed : ${seedsLeft}" class="list-unstyled">
 
-        <li><input th:text="${seed.name}" type="checkbox" name="seedIds" th:value="${seed.getId()}"/></li>
+        <li><input th:id="${seed.name}"  type="checkbox" name="seedIds" th:value="${seed.getId()}"/>
+        <label th:for="${seed.name}" th:text="${seed.name}"></label></li>
     </ul>
     <input type="hidden" th:value="${user.getId()}" name="userId" />
     <input type="submit" value ="Add more"/>
 
 
 </form>
+
 
 
 
