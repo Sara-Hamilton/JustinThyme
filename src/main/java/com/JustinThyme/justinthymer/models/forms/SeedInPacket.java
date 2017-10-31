@@ -29,6 +29,10 @@ public class SeedInPacket extends Seed {
     }
 
 
+   // public SeedInPacket findAllPacketSeeds() {return SeedInPacket;}
+
+
+    public int getId() {return id; }
     public Boolean getReminder() {
         return reminder;
     }
@@ -48,6 +52,7 @@ public class SeedInPacket extends Seed {
     public void setPacket(Packet packet) {
         this.packet = packet;
     }
+
 
     public void setReminder(SeedInPacket aSeed) {
         aSeed.reminder = true;

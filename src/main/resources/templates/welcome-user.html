@@ -13,33 +13,39 @@
 <div class="container-fluid">
     <h1 th:text="|Welcome ${user.username}|">Default welcome</h1>
 
+    <form method="post" action="welcome-user">
 
-    <h2>Here are the contents of your seed packet:</h2>
-    <table class="table">
-        <tr>
-            <th>Name</th>
-            <th>Plant Date</th>
-            <th>Reminder</th>
-        </tr>
-
-
-        <tr th:each="seed :${seeds}">
+    <tr th:each="seed :${seeds}">
+    <!--<td th:text="${seed.name}" type="checkbox" name="seedToRemoveIds" th:value="${seed.getId()}"></td>-->
         <td th:text="${seed.name}"></td>
-        <td th:text="${seed.plantDate}"></td>
+    <td th:text="${seed.plantDate}"></td>
+
+    <td th:if="${seed.getReminder() == true}" th:text="ON"></td>
+    <td th:if="${seed.getReminder() == false}" th:text="OFF"></td>
+        <td><input type="submit" name="seedToRemoveIds" th:value="${seed.getId()}"/></td>
+        <!--<td><input type="submit" name="seedToRemoveIds" value="Remove"/></td>-->
 
         <td th:if="${seed.getReminder() == true}" th:text="ON"></td>
         <td th:if="${seed.getReminder() == false}" th:text="OFF"></td>
 
-        </tr>
+        <input type="hidden" th:value="${user.getId()}" name="userId" />
 
-    </table>
+    </form>
+</table>
 
+
+<form method="post" action = "welcome-user">
     <h3>Here are some more seeds that grow in your area:</h3>
-    <ul class="leaf" th:each="seed: ${seedsLeft}">
-        <li th:text="${seed.name}"></li>
+    <ul class="leaf" th:each="seed : ${seedsLeft}">
 
+        <li><input th:text="${seed.name}" type="checkbox" name="seedIds" th:value="${seed.getId()}"/></li>
     </ul>
-</div>
+    <input type="hidden" th:value="${user.getId()}" name="userId" />
+    <input type="submit" value ="Add more"/>
+
+
+</form>
+
 
 
 <div th:replace="fragments :: javascript"></div>

@@ -2,6 +2,8 @@ package com.JustinThyme.justinthymer.controllers.GroundControl;
 
 
 import com.JustinThyme.justinthymer.controllers.TwilioReminder.TwillTask;
+import com.JustinThyme.justinthymer.models.converters.HashPass;
+
 import com.JustinThyme.justinthymer.models.data.PacketDao;
 import com.JustinThyme.justinthymer.models.data.SeedDao;
 import com.JustinThyme.justinthymer.models.data.SeedInPacketDao;
@@ -25,14 +27,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Timer;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
-//import  org.springframework.security.crypto.password;
-//import BCryptPasswordEncoder;
-//import org.mindrot.jbcrypt.BCrypt;
 
 @Controller
 @RequestMapping("JustinThyme")
@@ -54,7 +51,7 @@ public class MainController {
 //    private BCryptPasswordEncoder passwordEncoder;
 
 
-    @RequestMapping(value="")
+    @RequestMapping(value = "")
     public String splash(Model model) {
 
         model.addAttribute("title", "Welcome to JustinThyme");
@@ -62,13 +59,13 @@ public class MainController {
 
     }
 
-    @RequestMapping(value="/login", method = RequestMethod.GET)
+    @RequestMapping(value = "/login", method = RequestMethod.GET)
     public String login(Model model) {
         model.addAttribute("title", "Log on in!");
         return "/login";
     }
 
-    @RequestMapping(value="/login", method = RequestMethod.POST)
+    @RequestMapping(value = "/login", method = RequestMethod.POST)
     public String login(Model model, @RequestParam String username, @RequestParam String password, HttpServletResponse response, HttpServletRequest request) {
 
         //model.addAttribute("users", userDao.findAll());
@@ -85,7 +82,7 @@ public class MainController {
                 response.addCookie(usernameCookie);
 
                 // create and set cookie for sessionId
-                long sessionID = (long)(Math.random() * 1000000);
+                long sessionID = (long) (Math.random() * 1000000);
                 String sessionId = String.valueOf(sessionID);
                 Cookie sessionIdCookie = new Cookie("sessionId", sessionId);
                 sessionIdCookie.setMaxAge(60 * 60);
@@ -94,7 +91,7 @@ public class MainController {
                 // save data to database
                 user.setSessionId(sessionId);
                 userDao.save(user);
-              
+
                 // gets the packet associated with that user for display
                 Packet userPacket = packetDao.findByUserId(user.getId());
 
@@ -108,38 +105,37 @@ public class MainController {
                 }
 
 
-
                 List<Seed> seedsLeft = seedDao.findByArea(user.getArea());
                 seedsLeft.removeAll(seedsToRemove);
 
                 //note seedsLeft will be Seed objects and seeds will be SeedInPacket
 
+                model.addAttribute("user", user);
                 model.addAttribute("title", "Testing seed removal");
                 model.addAttribute("seeds", userPacket.getSeeds());
                 model.addAttribute("seedsLeft", seedsLeft);
-              
+
                 return "/welcome-user";
-               }
-                else {
+            } else {
                 model.addAttribute("title", "No user by that name or incorrect password!");
             }
         }
         return "/login";
     }
 
-    @RequestMapping(value="/logout", method = RequestMethod.GET)
+    @RequestMapping(value = "/logout", method = RequestMethod.GET)
     public String logout(Model model) {
         model.addAttribute("title", "Click here to Logout.");
         return "/logout";
     }
 
-    @RequestMapping(value="/logout", method = RequestMethod.POST)
+    @RequestMapping(value = "/logout", method = RequestMethod.POST)
     public String logout(Model model, HttpServletResponse response, HttpServletRequest request) {
         model.addAttribute("title", "See ya next Thyme!");
 
         // Remove sessionId from database
         Cookie[] cookies = request.getCookies();
-        for(Cookie cookie : cookies) {
+        for (Cookie cookie : cookies) {
             if ("sessionId".equals(cookie.getName())) {
                 String sessionId = cookie.getValue();
 
@@ -166,7 +162,6 @@ public class MainController {
     }
 
 
-
     @RequestMapping(value = "/signup", method = RequestMethod.GET)
     public String add(Model model) {
         model.addAttribute("title", "New User!");
@@ -183,9 +178,22 @@ public class MainController {
         String password = newUser.getPassword();
 
 
+        String passwordString = newUser.getPassword();
+        //takes string and converts to an array of chars
+        char[] passwordChars = passwordString.toCharArray();
+        //creates an array of 32 random bytes for salting the hash
+        byte[] salt = new byte[32];
+        new Random().nextBytes(salt);
 
-//        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-//        String hashedPassword = passwordEncoder.encode(password);
+
+       // passes char[] of password, salt, iterating twice, using 256 keylength(safe according to OWASP)
+        HashPass hashedPassword = new HashPass(passwordChars, salt, 2, 256);
+        //below puts back into String for User table
+        System.out.println("@@@HASHED PASSWORD::  " + hashedPassword);
+        //note even thought the HashPass class returns an array of bytes below doesn't work
+        //String reStrungPassword = new String(hashedPassword, StandardCharsets.UTF_8);
+
+        //TODO convert User table to save HashPass password instead of String password
 
 
         // username must be unique
@@ -204,7 +212,7 @@ public class MainController {
             model.addAttribute("title", "Try again");
             model.addAttribute(newUser);
             model.addAttribute("areas", Seed.Area.values());
-            if(password != "" && !password.equals(verifyPassword)) {
+            if (password != "" && !password.equals(verifyPassword)) {
                 model.addAttribute("errorMessage", "Passwords do not match.");
             }
             return "/signup";
@@ -215,11 +223,12 @@ public class MainController {
             response.addCookie(usernameCookie);
 
             // create and set cookie for sessionId
-            long sessionID = (long)(Math.random() * 1000000);
+            long sessionID = (long) (Math.random() * 1000000);
             String sessionId = String.valueOf(sessionID);
             Cookie sessionIdCookie = new Cookie("sessionId", sessionId);
             sessionIdCookie.setMaxAge(60 * 60);
             response.addCookie(sessionIdCookie);
+
 
             // save data to database
             newUser.setSessionId(sessionId);
@@ -245,7 +254,6 @@ public class MainController {
         model.addAttribute("user", newUser);
         return "/seed-edit";
     }
-
 
 
     @RequestMapping(value = "/seed-edit", method = RequestMethod.POST)
@@ -309,52 +317,142 @@ public class MainController {
     }
 
 
-    @RequestMapping(value="/welcome-user", method=RequestMethod.POST)
-    public String welcomeDisplay(HttpSession session, Model model, User loggedUser, @ModelAttribute Packet aPacket,
-                                 @RequestParam int[] seedIds, Integer userId) {
-        aPacket = packetDao.findOne(userId);
-
-        model.addAttribute("user", loggedUser);
-        model.addAttribute("seeds", aPacket.getSeeds());
-        return "/welcome-user";
-    }
-
-    @RequestMapping(value="/welcome-user-temp")
-
-    public String tempHolder(Model model, HttpServletRequest request) {
+    @RequestMapping(value ="/welcome-user", method =RequestMethod.GET)
+    public String dashboard (Model model, HttpServletRequest request){
         User user = (User)request.getSession().getAttribute("user");
+
+//        if user is not logged in, sent back to splash page
         if(user == null){
             model.addAttribute("title", "Login");
             return "/splash";
+        } else{
+            Packet aPacket = packetDao.findByUserId(user.getId());
+
+            List<Seed> seedsToRemove = new ArrayList<>();
+            for (SeedInPacket seedInPacket : aPacket.getSeeds()) {
+                String name = seedInPacket.getName();
+                List<Seed> aSeed = seedDao.findByName(name);
+                seedsToRemove.addAll(aSeed);
+            }
+
+            List<Seed> notChosenSeeds = seedDao.findByArea(user.getArea());
+            notChosenSeeds.removeAll(seedsToRemove);
+
+            model.addAttribute("user", user);
+            model.addAttribute("seeds", aPacket.getSeeds());
+            model.addAttribute("seedsLeft", notChosenSeeds);
+        }
+        return "/welcome-user";
+    }
+
+    @RequestMapping (value ="/welcome-user", method = RequestMethod.POST)
+    public String dashboardAdd (Model model , @RequestParam(required = false)int[] seedToRemoveIds,
+                                @RequestParam(required = false)int[] seedIds,
+                                @RequestParam Integer userId){
+
+
+
+        Packet aPacket = packetDao.findByUserId(userId);
+
+        List<SeedInPacket> seedsToPlant = new ArrayList<>();
+        List<Seed> pickedSeedsAsSeeds = new ArrayList<>();
+
+
+
+        //remove seeds from packet if they are selected
+        //for (int seedToRemoveId : seedToRemoveIds) {
+            if (seedToRemoveIds != null) {
+                for (int id : seedToRemoveIds) {
+                    SeedInPacket seedToGo = seedInPacketDao.findById(id);
+                    seedInPacketDao.delete(seedToGo);
+                }
+            }
+
+
+        //add selected seed to seedInPacketDao
+        if (seedIds != null) {
+            for (int seedId : seedIds) {
+                Seed seedPicked = seedDao.findOne(seedId);
+                pickedSeedsAsSeeds.add(seedPicked);
+
+                SeedInPacket seedToPlant = SeedToPacketSeed.fromSeedToPacket(seedPicked, aPacket);
+                seedToPlant.setReminder(seedToPlant);
+                seedsToPlant.add(seedToPlant);
+                seedInPacketDao.save(seedToPlant);
+            }
         }
 
-        return "/welcome-user-temp";
+        User user = userDao.findOne(userId);
+
+        //get seedname from user's seedInPacket
+        List<Seed> seedsToRemove = new ArrayList<>();
+        for (SeedInPacket seedInPacket : aPacket.getSeeds()) {
+            String name = seedInPacket.getName();
+            List<Seed> aSeed = seedDao.findByName(name);
+            seedsToRemove.addAll(aSeed);
+        }
+
+        //TODO put if conditional to removeReminder form seedInPacket from radio button in form
+
+        List<Seed> seedsLeft = seedDao.findByArea(user.getArea());
+        seedsLeft.removeAll(seedsToRemove);
+
+        model.addAttribute("user", user);
+        model.addAttribute("seeds", aPacket.getSeeds());
+        model.addAttribute("seedsLeft",seedsLeft );
+
+        return "/welcome-user";
     }
 
-    @RequestMapping(value = "/unsubscribe")
-    public String displayConstruction() {
-        return "/well-wishes";
+
+
+
+    @RequestMapping(value = "/unsubscribe", method = RequestMethod.GET)
+    public String displayUserToRemove(Model model) {
+
+        model.addAttribute("title", "Sayonara!");
+        return "/unsubscribe";
     }
 
-//    @RequestMapping(value = "/unsubscribe", method = RequestMethod.GET)
-//    public String displayUserToRemove(HttpSession session, Model model, @RequestParam int userId) {
-//        //System.out.println(session.getAttributeNames());
-//        //model.addAttribute("user", userDao.getAll());
-//        model.addAttribute("title", "Sayonara!");
-//        return "unsubscribe" + userId;
-//    }
-//
-//    @RequestMapping(value = "/unsubscribe/<userId>", method = RequestMethod.POST)
-//    public String processUserRemoval(@RequestParam int userId) {
-//
-//        User exUser = userDao.findById(userId);
-//        //Packet moldyPacket = packetDao.findByUserId(userId);
-//        //packetDao.delete(moldyPacket);
-//        userDao.delete(exUser);
-//
-//        return "/well-wishes";
-//    }
+    @RequestMapping(value = "/unsubscribe", method = RequestMethod.POST)
+    public String processUserRemoval(Model model, HttpServletRequest request) {
+
+        User user = (User) request.getSession().getAttribute("user");
+
+        if (user == null) {
+            return "redirect:login";
+        }
+
+        else {
+
+            //retrieve and iterate over users packet to remove seeds before deleting user
+            List<SeedInPacket> seeds = seedInPacketDao.findAll();
+            Packet moldyPacket = packetDao.findByUserId(user.getId());
+                for (SeedInPacket seed : seeds) {
+                    if (seed.getPacket() == moldyPacket) {
+                        seedInPacketDao.delete(seed);
+                    }
+                }
+                //this qualifier avoids the error if unsubscribe twice in a row
+                if (moldyPacket != null) {
+                packetDao.delete(moldyPacket);}
+                // "logs out" user before deletion
+                request.getSession().removeAttribute("user");
+                userDao.delete(user);
+                model.addAttribute("title", "Deleted!");
+                return "/well-wishes";
+
+            }
+        }
+
+    @RequestMapping(value="edit-profile")
+    public String tempPlaceHolder() {
+        return "/edit-profile";
+    }
+
+    }
 
 
 
-}
+
+
