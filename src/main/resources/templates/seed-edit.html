@@ -9,19 +9,22 @@
 
 <nav th:replace="fragments :: navigation"></nav>
 
-<h1 th:text="|Hey ${user.username}, here's a list of seeds that grow in you're area: |">seeds</h1>
+<div class="container-fluid">
+    <h1 th:text="|Hey ${user.username}, here's a list of seeds that grow in you're area: |">seeds</h1>
 
-<form method="post" action="seed-edit">
-    <p>Check what seeds you like and we will automatically send you updates!</p>
-<ul th:each="seed : ${seeds}">
+    <form method="post" action="seed-edit">
+        <p>Check what seeds you like and we will automatically send you updates!</p>
+    <ul th:each="seed : ${seeds}" class="list-unstyled">
 
-        <li><input th:text="${seed.name}" type="checkbox" name="seedIds" th:value="${seed.getId()}"/></li>
-    </ul>
+            <li><input type="checkbox" th:id="${seed.name}" name="seedIds" th:value="${seed.getId()}"/>
+                <label th:for="${seed.name}" th:text="${seed.name}"></label></li>
+        </ul>
 
-    <input type="hidden" th:value="${user.getId()}" name="userId" />
-    <input type="submit" value="Seed" />
+        <input type="hidden" th:value="${user.getId()}" name="userId" />
+        <input type="submit" class="btn btn-sm btn-primary" value="Add to My List" />
 
-</form>
+    </form>
+</div>
 
 <div th:replace="fragments :: javascript"></div>
 </body>

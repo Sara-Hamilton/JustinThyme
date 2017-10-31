@@ -18,6 +18,8 @@ public interface SeedInPacketDao extends CrudRepository<SeedInPacket, Integer> {
 
     List<SeedInPacket> findAll();
 
+    SeedInPacket findById(int id);
+
     //List<SeedInPacket> findAll();
 
 
