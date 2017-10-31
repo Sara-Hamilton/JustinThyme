@@ -109,6 +109,12 @@ public class MainController {
                 // gets the packet associated with that user for display
                 Packet userPacket = packetDao.findByUserId(user.getId());
 
+                // redirects user to seed-edit page if they have no seeds in their packet
+                if (userPacket == null) {
+                    model.addAttribute("seeds", seedDao.findByArea(user.getArea()));
+                    return "/seed-edit";
+                }
+
                 //makes a list of seeds not picked for display from list of seedsInPacket
                 List<Seed> seedsToRemove = new ArrayList<>();
                 for (SeedInPacket seedInPacket : userPacket.getSeeds()) {
@@ -411,7 +417,12 @@ public class MainController {
             return "/splash";
         } else{
             Packet aPacket = packetDao.findByUserId(user.getId());
-
+            // redirects user to seed-edit page if they have no seeds in their packet
+            if (aPacket == null) {
+                model.addAttribute("user", user);
+                model.addAttribute("seeds", seedDao.findByArea(user.getArea()));
+                return "/seed-edit";
+            }
             List<Seed> seedsToRemove = new ArrayList<>();
             for (SeedInPacket seedInPacket : aPacket.getSeeds()) {
                 String name = seedInPacket.getName();
