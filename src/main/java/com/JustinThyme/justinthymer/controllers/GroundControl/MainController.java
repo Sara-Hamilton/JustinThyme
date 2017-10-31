@@ -389,10 +389,20 @@ public class MainController {
 
             //take user form session, and use validated fields to take new values
             aUser.setPhoneNumber(updatedUser.getPhoneNumber());
+            // empty seed packet if user changes area
+            if (aUser.getArea() != updatedUser.getArea()) {
+                Packet aPacket = packetDao.findByUserId(aUser.getId());
+                List<SeedInPacket> seedsToRemove = aPacket.getSeeds();
+                for (Seed seed : seedsToRemove) {
+                    seedInPacketDao.delete((SeedInPacket) seed);
+                }
+            }
+
             aUser.setArea(updatedUser.getArea());
             aUser.setPassword(updatedUser.getPassword());
 
             userDao.save(aUser);
+            request.getSession().setAttribute("user", aUser);
 
             model.addAttribute("user", aUser);
             model.addAttribute("areas", Seed.Area.values());
