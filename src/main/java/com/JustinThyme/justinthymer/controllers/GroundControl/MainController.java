@@ -338,16 +338,17 @@ public class MainController {
 
 
     @RequestMapping(value = "/edit-profile", method = RequestMethod.GET)
-    public String editProfilePreferences(Model model) {
+    public String editProfilePreferences(Model model, HttpServletRequest request) {
         // display form with relevant options
         // change your area?
         // change your cell phone
         // change your password
 
-       Integer userId = (Integer) httpSession.getAttribute("user_id");
-       User aUser = userDao.findById(userId);
+       User aUser = (User) request.getSession().getAttribute("user");
+       //User aUser = userId.getId();
+       //User aUser = userDao.findById(userId);
 
-        if (userId != 0) {
+        if (aUser != null) {
             model.addAttribute("user", aUser);
             model.addAttribute("areas", Seed.Area.values());
             model.addAttribute("title", "Editing Preferences for " + aUser.username);
@@ -361,15 +362,16 @@ public class MainController {
     }
 
     @RequestMapping(value = "/edit-profile", method = RequestMethod.POST)
-    public String saveChangesToProfilePreferences(@ModelAttribute @Valid User updatedUser, Errors errors, Model model) {
+    public String saveChangesToProfilePreferences(@ModelAttribute @Valid User updatedUser, Errors errors, Model model, HttpServletRequest request) {
 
         //process form, capture all user input into fields
         //make operative changes upon user's information in the database
         //update changes to user in database, save AND commit to it
         //return the same page with the update information displayed
 
-        Integer userId = (Integer) httpSession.getAttribute("user_id");
-        User aUser = userDao.findById(userId);
+        //Integer userId = (Integer) httpSession.getAttribute("user_id");
+        //User aUser = userDao.findById(userId);
+        User aUser = (User) request.getSession().getAttribute("user");
 
         if (errors.hasErrors()) {
             model.addAttribute("user", aUser);
@@ -397,14 +399,15 @@ public class MainController {
     @RequestMapping(value="/welcome-user-temp")
     public String tempHolder() {
         return "/welcome-user-temp";
+    }
 
-    @RequestMapping(value ="/welcome-user", method =RequestMethod.GET)
+    @RequestMapping(value ="/welcome-user", method = RequestMethod.GET)
     public String dashboard (Model model, HttpServletRequest request){
         User user = (User)request.getSession().getAttribute("user");
 
 //        if user is not logged in, sent back to splash page
         if(user == null){
-            model.addAttribute("title", "Login");
+            model.addAttribute("title", "Welcome to JustinThyme");
             return "/splash";
         } else{
             Packet aPacket = packetDao.findByUserId(user.getId());
