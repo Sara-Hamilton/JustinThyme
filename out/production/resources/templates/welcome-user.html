@@ -1,23 +1,53 @@
 <!DOCTYPE html>
-<!--<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">-->
-<!--TODO why does intelliJ recommend the above ref?-->
 
-<html lang="en" xmlns:th="http://www.thymeleag.org/">
+<html lang="en" xmlns:th="http://www.thymeleaf.org/" xmlns="http://www.w3.org/1999/html">
 
 <head th:replace="fragments :: head">
 
 </head>
 <body>
 
+<nav th:replace="fragments :: navigation"></nav>
+
 <h1 th:text="|Welcome ${user.username}|">Default welcome</h1>
 
-<h2>Here are the contents of your seed packet:</h2>
-<tr th:each="seed : ${user.seeds}">
-    <ul>
-        <li th:text="|${seed.name} crops are typcically grown in ${seed.season}|. Reminder: {seed.reminder}"></li>
-        <!--TODO make seed.reminder == "ON" or "OFF"-->
-    </ul>
-</tr>
 
+<h2>Here are the contents of your seed packet:</h2>
+<table class="table">
+    <tr>
+        <th>Name</th>
+        <th>Plant Date</th>
+        <th>Reminder</th>
+    </tr>
+
+    <form method="post">
+
+    <tr th:each="seed :${seeds}">
+    <td th:text="${seed.name}" type="checkbox" name="seedToRemoveIds" th:value="${seed.getId()}"></td>
+    <td th:text="${seed.plantDate}"></td>
+
+    <td th:if="${seed.getReminder() == true}" th:text="ON"></td>
+    <td th:if="${seed.getReminder() == false}" th:text="OFF"></td>
+
+    </tr>
+    </form>
+</table>
+
+
+<form method="post" action = "welcome-user">
+    <h3>Here are some more seeds that grow in your area:</h3>
+    <ul th:each="seed : ${seedsLeft}">
+
+        <li><input th:text="${seed.name}" type="checkbox" name="seedIds" th:value="${seed.getId()}"/></li>
+    </ul>
+    <input type="hidden" th:value="${user.getId()}" name="userId" />
+    <input type="submit" value ="Add more"/>
+
+
+</form>
+
+
+
+<div th:replace="fragments :: javascript"></div>
 </body>
 </html>

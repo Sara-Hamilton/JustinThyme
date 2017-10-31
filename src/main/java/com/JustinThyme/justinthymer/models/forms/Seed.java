@@ -10,7 +10,7 @@ import java.util.List;
 
 @Entity
 public class Seed {
-
+//TODO before production change all id values to long
     @Id
     @GeneratedValue
     public int id;
@@ -53,9 +53,9 @@ public class Seed {
                 plantDate = new Date(118, 8, 1, 19, 05);
                 break;
             case TONIGHT:
-                Date now = new Timestamp(System.currentTimeMillis());
-                plantDate = now;
-                //plantDate = new Date(117, 9, 19, 16, 05);
+                //Date now = new Timestamp(System.currentTimeMillis());
+                //plantDate = now;
+                plantDate = new Date(117, 9, 23, 9, 33);
                 break;
             default:
                plantDate = null;
@@ -78,7 +78,7 @@ public class Seed {
         //this.plantDate = aDate; note expand with api later perhaps
         this.plantDate = simpleDateGet(aSeason);
         //this.packets = packets;
-        this.reminder = false;
+        //this.reminder = false;
     }
 
     public Seed () { }
@@ -92,6 +92,7 @@ public class Seed {
     public void setName(String name) {
         this.name = name;
     }
+
 
     public Area getArea() {
         return area;
@@ -116,12 +117,21 @@ public class Seed {
         this.plantDate = plantDate;
     }
 
-
     public Boolean getReminder() {
         return reminder;
     }
-//note following in packet
-//    public void setReminder(Boolean reminder) {
-//        this.reminder = reminder;
+
+
+    //
+//    public void setReminder() {
+//        this.reminder = true;
 //    }
+//
+//    public void removeReminder() {
+//        this.reminder = false;
+////    }
+//    }
+
+
+
 }

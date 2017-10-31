@@ -7,8 +7,10 @@
 <body>
 <nav th:replace="fragments :: navigation"></nav>
 
-
-<h1>Progress is being made, wheels are in motion, [insert platitude here]!</h1>
+<div class="container-fluid">
+    <h1>Progress is being made, wheels are in motion, [insert platitude here]!</h1>
+    <p th:text="${session.user.username}" th:unless="${session == null}">[...]</p>
+</div>
 
 <div th:replace="fragments :: javascript"></div>
 </body>

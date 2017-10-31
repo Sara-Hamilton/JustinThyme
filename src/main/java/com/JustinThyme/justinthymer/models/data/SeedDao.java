@@ -18,4 +18,6 @@ public interface SeedDao extends CrudRepository<Seed, Integer> {
 
     List<Seed> findBySeason(Seed.Season season);
 
+    List<Seed> findAll() ;
+
 }

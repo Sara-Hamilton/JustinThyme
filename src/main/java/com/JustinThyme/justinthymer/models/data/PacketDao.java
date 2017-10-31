@@ -12,5 +12,5 @@ import javax.transaction.Transactional;
 @Transactional
 public interface PacketDao extends CrudRepository<Packet, Integer> {
 
-   // Packet findByUserId(int user_id);
+    Packet findByUserId(int user_id);
 }
