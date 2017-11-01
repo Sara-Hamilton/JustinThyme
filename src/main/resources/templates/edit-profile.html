@@ -32,7 +32,12 @@
     </div>
 
     <div>
-        <a href="/JustinThyme/change-password">Click here to change your password</a>
+        <a href="/JustinThyme/change-password">Change password</a>
+        <p></p>
+    </div>
+
+    <div>
+        <a href="/JustinThyme/unsubscribe">Unsubscribe</a>
     </div>
 
     <div class="form-group">
@@ -45,6 +50,7 @@
         <label th:for="phoneNumber">Phone Number</label>
         <input class="form-control" th:value="*{phoneNumber}" th:field="*{phoneNumber}" type="text" />
         <span th:errors="*{phoneNumber}" class="error"></span>
+        <span class="text-success" th:text="${phoneNumberChangedMessage}"></span>
     </div>
 
     <div class="form-group">
@@ -54,6 +60,8 @@
                     th:text="${area.name}"
                     th:value="${area}"></option>
         </select>
+        <p class="text-warning">Changing area will void all current reminders.</p>
+        <span class="text-success" th:text="${areaChangedMessage}"></span>
         <span th:errors="*{area}" class="error"></span>
     </div>
 
