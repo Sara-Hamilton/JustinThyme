@@ -368,7 +368,7 @@ public class MainController {
     }
 
     @RequestMapping(value = "/edit-profile", method = RequestMethod.POST)
-    public String saveChangesToProfilePreferences(@ModelAttribute @Valid User updatedUser, Errors errors,
+    public String saveChangesToProfilePreferences(@ModelAttribute @Valid User user, Errors errors,
                                                   Model model, HttpServletRequest request) {
 
         //process form, capture all user input into fields
@@ -381,7 +381,7 @@ public class MainController {
         User aUser = (User) request.getSession().getAttribute("user");
 
         if (errors.hasErrors()) {
-            model.addAttribute("user", aUser);
+            model.addAttribute("user", user);
             model.addAttribute("areas", Seed.Area.values());
             model.addAttribute("title", "Editing Preferences for " + aUser.username);
             return "/edit-profile";
@@ -390,18 +390,22 @@ public class MainController {
 
 
             //take user form session, and use validated fields to take new values
-            aUser.setPhoneNumber(updatedUser.getPhoneNumber());
+            if (!(aUser.getPhoneNumber().equals(user.getPhoneNumber()))) {
+                model.addAttribute("phoneNumberChangedMessage", "Phone number has been changed.");
+            }
+            aUser.setPhoneNumber(user.getPhoneNumber());
             // empty seed packet if user changes area
-            if (aUser.getArea() != updatedUser.getArea()) {
+            if (aUser.getArea() != user.getArea()) {
                 Packet aPacket = packetDao.findByUserId(aUser.getId());
                 List<SeedInPacket> seedsToRemove = aPacket.getSeeds();
                 for (Seed seed : seedsToRemove) {
                     seedInPacketDao.delete((SeedInPacket) seed);
                 }
+                model.addAttribute("areaChangedMessage", "Area has been changed.");
             }
 
-            aUser.setArea(updatedUser.getArea());
-            aUser.setPassword(updatedUser.getPassword());
+            aUser.setArea(user.getArea());
+            aUser.setPassword(user.getPassword());
 
             userDao.save(aUser);
             request.getSession().setAttribute("user", aUser);
