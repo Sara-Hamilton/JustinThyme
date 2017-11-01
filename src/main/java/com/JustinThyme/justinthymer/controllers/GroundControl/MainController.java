@@ -412,6 +412,68 @@ public class MainController {
 
     }
 
+    @RequestMapping(value = "/change-password", method = RequestMethod.GET)
+    public String changePassword(Model model, HttpServletRequest request){
+        User aUser = (User) request.getSession().getAttribute("user");
+
+        if (aUser != null) {
+            model.addAttribute("user", aUser);
+            model.addAttribute("title", "Change Password for " + aUser.username);
+            return "/change-password";
+        } else {
+            //if no current user, redirect to splash page
+            //nothing to edit if user is not logged in
+            model.addAttribute("title", "Welcome to JustinThyme");
+            return "splash";
+        }
+    }
+
+    @RequestMapping(value = "/change-password", method = RequestMethod.POST)
+    public String changePassword(@ModelAttribute @Valid User user, Errors errors, Model model, String password, String newPassword,
+                                       String verifyNewPassword, HttpServletRequest request, HttpServletResponse response){
+
+        User aUser = (User) request.getSession().getAttribute("user");
+
+        if (!password.equals(aUser.getPassword())) {
+            model.addAttribute("title", "Try again");
+            model.addAttribute("passwordErrorMessage", "Incorrect password");
+            //model.addAttribute(user);
+            return "/change-password";
+        }
+        else if (!newPassword.equals(verifyNewPassword) || newPassword.length() < 6 || newPassword.equals(aUser.getPassword())) {
+            model.addAttribute("title", "Try again");
+            //model.addAttribute(user);
+            if (newPassword.length() < 6) {
+                model.addAttribute("newPasswordErrorMessage", "Passwords must be at least 6 characters long.");
+            }
+            if (newPassword.equals(aUser.getPassword())) {
+                model.addAttribute("newPasswordErrorMessage2", "Use a different password.");
+            }
+            if (newPassword != "" && !newPassword.equals(verifyNewPassword)) {
+                model.addAttribute("errorMessage", "Passwords do not match.");
+            }
+
+            return "/change-password";
+        }
+
+        //model.addAttribute(user);
+        aUser.setPassword(newPassword);
+        userDao.save(aUser);
+
+        //Remove cookies
+        Cookie userCookie = new Cookie("username", "");
+        Cookie sessionIdCookie = new Cookie("sessionId", "");
+        userCookie.setMaxAge(0);
+        sessionIdCookie.setMaxAge(0);
+        response.addCookie(userCookie);
+        response.addCookie(sessionIdCookie);
+        request.getSession().removeAttribute("user");
+
+        model.addAttribute("title", "Login with New Password");
+        return "redirect:";
+    }
+
+
     @RequestMapping(value="/welcome-user-temp")
     public String tempHolder() {
         return "/welcome-user-temp";
