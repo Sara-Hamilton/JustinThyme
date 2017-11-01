@@ -401,6 +401,8 @@ public class MainController {
                 for (Seed seed : seedsToRemove) {
                     seedInPacketDao.delete((SeedInPacket) seed);
                 }
+                //must delete packet to avoid multiples with same user_id => crash table
+                packetDao.delete(aPacket);
                 model.addAttribute("areaChangedMessage", "Area has been changed.");
             }
 
