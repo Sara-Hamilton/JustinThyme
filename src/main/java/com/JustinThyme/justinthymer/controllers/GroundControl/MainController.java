@@ -13,27 +13,18 @@ import com.JustinThyme.justinthymer.models.forms.Packet;
 import com.JustinThyme.justinthymer.models.forms.Seed;
 import com.JustinThyme.justinthymer.models.forms.SeedInPacket;
 import com.JustinThyme.justinthymer.models.forms.User;
-import com.JustinThyme.justinthymer.models.forms.UserData;
-import com.oracle.jrockit.jfr.ValueDefinition;
-import org.apache.http.protocol.HTTP;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
-import org.thymeleaf.util.ListUtils;
-
-// import org.springframework.web.bind.annotation.ModelAttribute;
-// import org.springframework.web.bind.annotation.RequestMapping;
-// import org.springframework.web.bind.annotation.RequestMethod;
-// import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
-import java.nio.charset.StandardCharsets;
+
 import java.util.*;
 
 
@@ -209,7 +200,7 @@ public class MainController {
        // passes char[] of password, salt, iterating twice, using 256 keylength(safe according to OWASP)
         HashPass hashedPassword = new HashPass(passwordChars, salt, 2, 256);
         //below puts back into String for User table
-        System.out.println("@@@HASHED PASSWORD::  " + hashedPassword);
+        //System.out.println("@@@HASHED PASSWORD::  " + hashedPassword);
         //note even thought the HashPass class returns an array of bytes below doesn't work
         //String reStrungPassword = new String(hashedPassword, StandardCharsets.UTF_8);
 
@@ -398,6 +389,13 @@ public class MainController {
                 for (Seed seed : seedsToRemove) {
                     seedInPacketDao.delete((SeedInPacket) seed);
                 }
+                //must delete packet to avoid multiples with same user_id => crash table
+                packetDao.delete(aPacket);
+                model.addAttribute("title", "New area!");
+                model.addAttribute("user", aUser);
+                model.addAttribute("seeds", seedDao.findByArea(updatedUser.getArea()));
+
+                return "/seed-edit";
             }
 
             aUser.setArea(updatedUser.getArea());
@@ -615,10 +613,6 @@ public class MainController {
             }
         }
 
-//     @RequestMapping(value="edit-profile")
-//     public String tempPlaceHolder() {
-//         return "/edit-profile";
-//     }
 
     }
 
