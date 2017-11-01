@@ -52,9 +52,6 @@ public class MainController {
 
     private SeedInPacketDao seedInPacketDao;
 
-//    @Autowired
-//    private BCryptPasswordEncoder passwordEncoder;
-
 
     @RequestMapping(value = "")
     public String splash(Model model) {
@@ -97,7 +94,6 @@ public class MainController {
                 user.setSessionId(sessionId);
                 userDao.save(user);
 
-//                 model.addAttribute("seeds", seedDao.findByArea(user.getArea()));
 //                 //TODO set sessionID and cookie to something other than username for security
 //                 httpSession.setAttribute("user_id", user.getId());
 
@@ -115,7 +111,7 @@ public class MainController {
                 for (SeedInPacket seedInPacket : userPacket.getSeeds()) {
                     String name = seedInPacket.getName();
                     List<Seed> aSeed = seedDao.findByName(name);
-                    // note returns a list of all the seeds with that name, not most efficient but it works
+                    // note returns a list of all the seeds with that name, most efficient?
                     seedsToRemove.addAll(aSeed);
                 }
 
@@ -191,46 +187,10 @@ public class MainController {
 
         String username = newUser.username;
 
-//        PasswordEncoder passwordEncoder = new BCryptPassWordEncoder();
-//        String hashedPass = passwordEncoder.encode(password);
-
-
-
-        //note below is OWASP
-
-        //String passwordString = newUser.getPassword();
-        //takes string and converts to an array of chars
-
-       // creates an array of 32 random bytes for salting the hash
-       //byte[] salt = new byte[32];
-        //new Random().nextBytes(salt);
-//
-//        String saltyPhrase = "this-is-some-salty-stuff";
-//        byte[] salt = saltyPhrase.getBytes();
-//
-
-       // passes char[] of password, salt, iterating twice, using 256 keylength(safe according to OWASP)
-//
-//        System.out.println("Salty::  " + salt);
-//        HashPass hashedPassword = new HashPass(password, salt, 2, 256);
-//        //byte[] _password = hashedPassword;
-//        //below puts back into String for User table
-//        System.out.println("@@@HASHED PASSWORD::  " + hashedPassword);
-//        System.out.println("Salty::  " + salt);
-
-
-        //note even thought the HashPass class returns an array of bytes below doesn't work
-        //String restrungPassword = IOUtils.toString(hashedPassword);
-//        String reStrungPassword = new String(hashedPassword, StandardCharsets.UTF_8);
-//        String _password = new String(hashedPassword, "UTF-8");
-
-        //TODO convert User table to save HashPass password instead of String password
-
 
         // username must be unique
         Iterable<User> users = userDao.findAll();
-        //String checkPass = new String(password, StandardCharsets.UTF_8);
-        //String checkPass = new String(password);
+
         for (User user : users) {
             if (user.getUsername().equals(username)) {
                 model.addAttribute("title", "Try again");
@@ -264,20 +224,7 @@ public class MainController {
             sessionIdCookie.setMaxAge(60 * 60);
             response.addCookie(sessionIdCookie);
 
-
-            // save data to database
-            //char[] charPass = password.toCharArray();
-//note hash password before saving to db.
-//            String saltyPhrase = "this-is-some-salty-stuff";
-//            byte[] salt = saltyPhrase.getBytes();
-//
-//
-//            // passes char[] of password, salt, iterating twice, using 256 keylength(safe according to OWASP)
-//
-//            System.out.println("Salty::  " + salt);
-//            newUser.setPassword(HashPass.hashPass(password, salt, 2, 256);
-            //newUser.setPassword(HashPass.hashPass(password));
-
+            //hashes password before saving to User
             newUser.setPassword(HashPass.generateHash(password));
             newUser.setSessionId(sessionId);
             userDao.save(newUser);
@@ -379,8 +326,6 @@ public class MainController {
         // change your password
 
        User aUser = (User) request.getSession().getAttribute("user");
-       //User aUser = userId.getId();
-       //User aUser = userDao.findById(userId);
 
         if (aUser != null) {
             model.addAttribute("user", aUser);
@@ -404,8 +349,6 @@ public class MainController {
         //update changes to user in database, save AND commit to it
         //return the same page with the update information displayed
 
-        //Integer userId = (Integer) httpSession.getAttribute("user_id");
-        //User aUser = userDao.findById(userId);
         User aUser = (User) request.getSession().getAttribute("user");
 
         if (errors.hasErrors()) {
@@ -415,7 +358,6 @@ public class MainController {
             return "/edit-profile";
         } else {
             //SAVE CHANGED INFO
-
 
             //take user form session, and use validated fields to take new values
             aUser.setPhoneNumber(updatedUser.getPhoneNumber());
@@ -472,11 +414,10 @@ public class MainController {
 
         User aUser = (User) request.getSession().getAttribute("user");
 
-        String newHash = HashPass.generateHash(newPassword);
+        //hashes input password and checks against stored password
+
         String checkPass = HashPass.generateHash(password);
         String realPass = new String(aUser.getPassword());
-        System.out.println("***" + checkPass);
-        System.out.println("#####" + realPass);
         if (!checkPass.equals(realPass)) {
             model.addAttribute("title", "Try again");
             model.addAttribute("passwordErrorMessage", "Incorrect password");
@@ -506,6 +447,9 @@ public class MainController {
 //        char[] passyChars = newPassword.toCharArray();
 //        byte[] newHashedPassword = HashPass.hashPass(passyChars, salt, 2, 256);
        // String newHashedPassword = HashPass.generateHash(newPassword);
+
+        //if everything valid then hash new password and save
+        String newHash = HashPass.generateHash(newPassword);
         aUser.setPassword(newHash);
         userDao.save(aUser);
 
