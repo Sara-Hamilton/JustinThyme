@@ -368,7 +368,8 @@ public class MainController {
     }
 
     @RequestMapping(value = "/edit-profile", method = RequestMethod.POST)
-    public String saveChangesToProfilePreferences(@ModelAttribute @Valid User updatedUser, Errors errors, Model model, HttpServletRequest request) {
+    public String saveChangesToProfilePreferences(@ModelAttribute @Valid User updatedUser, Errors errors,
+                                                  Model model, HttpServletRequest request) {
 
         //process form, capture all user input into fields
         //make operative changes upon user's information in the database
@@ -386,6 +387,7 @@ public class MainController {
             return "/edit-profile";
         } else {
             //SAVE CHANGED INFO
+
 
             //take user form session, and use validated fields to take new values
             aUser.setPhoneNumber(updatedUser.getPhoneNumber());
@@ -408,6 +410,7 @@ public class MainController {
             model.addAttribute("areas", Seed.Area.values());
             model.addAttribute("title", "Editing Preferences for " + aUser.username);
             return "/edit-profile";
+
         }
 
     }
