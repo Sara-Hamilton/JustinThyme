@@ -13,28 +13,24 @@ import com.JustinThyme.justinthymer.models.forms.Packet;
 import com.JustinThyme.justinthymer.models.forms.Seed;
 import com.JustinThyme.justinthymer.models.forms.SeedInPacket;
 import com.JustinThyme.justinthymer.models.forms.User;
-import com.JustinThyme.justinthymer.models.forms.UserData;
-import com.oracle.jrockit.jfr.ValueDefinition;
-import org.apache.http.protocol.HTTP;
+import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
-import org.thymeleaf.util.ListUtils;
 
-// import org.springframework.web.bind.annotation.ModelAttribute;
-// import org.springframework.web.bind.annotation.RequestMapping;
-// import org.springframework.web.bind.annotation.RequestMethod;
-// import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
+
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 
 @Controller
@@ -55,10 +51,6 @@ public class MainController {
 //     private HttpSession httpSession;
 
     private SeedInPacketDao seedInPacketDao;
-
-//    @Autowired
-//    private BCryptPasswordEncoder passwordEncoder;
-
 
 
     @RequestMapping(value = "")
@@ -81,7 +73,7 @@ public class MainController {
         //model.addAttribute("users", userDao.findAll());
         Iterable<User> users = userDao.findAll();
         for (User user : users) {
-            if (user.getUsername().equals(username) && user.getPassword().equals(password)) {
+            if (user.getUsername().equals(username) && user.getPassword().equals(HashPass.generateHash(password))) {
                 model.addAttribute("user", user);
                 // add user to session
                 request.getSession().setAttribute("user", user);
@@ -102,7 +94,6 @@ public class MainController {
                 user.setSessionId(sessionId);
                 userDao.save(user);
 
-//                 model.addAttribute("seeds", seedDao.findByArea(user.getArea()));
 //                 //TODO set sessionID and cookie to something other than username for security
 //                 httpSession.setAttribute("user_id", user.getId());
 
@@ -120,7 +111,7 @@ public class MainController {
                 for (SeedInPacket seedInPacket : userPacket.getSeeds()) {
                     String name = seedInPacket.getName();
                     List<Seed> aSeed = seedDao.findByName(name);
-                    // note returns a list of all the seeds with that name, not most efficient but it works
+                    // note returns a list of all the seeds with that name, most efficient?
                     seedsToRemove.addAll(aSeed);
                 }
 
@@ -191,33 +182,15 @@ public class MainController {
     }
 
     @RequestMapping(value = "/signup", method = RequestMethod.POST)
-    public String add(@ModelAttribute @Valid User newUser, Errors errors, Model model,
+    public String add(@ModelAttribute @Valid User newUser, Errors errors, Model model, String password,
                       String verifyPassword, HttpServletResponse response, HttpServletRequest request) {
 
         String username = newUser.username;
-        String password = newUser.getPassword();
-
-
-        String passwordString = newUser.getPassword();
-        //takes string and converts to an array of chars
-        char[] passwordChars = passwordString.toCharArray();
-        //creates an array of 32 random bytes for salting the hash
-        byte[] salt = new byte[32];
-        new Random().nextBytes(salt);
-
-
-       // passes char[] of password, salt, iterating twice, using 256 keylength(safe according to OWASP)
-        HashPass hashedPassword = new HashPass(passwordChars, salt, 2, 256);
-        //below puts back into String for User table
-        System.out.println("@@@HASHED PASSWORD::  " + hashedPassword);
-        //note even thought the HashPass class returns an array of bytes below doesn't work
-        //String reStrungPassword = new String(hashedPassword, StandardCharsets.UTF_8);
-
-        //TODO convert User table to save HashPass password instead of String password
 
 
         // username must be unique
         Iterable<User> users = userDao.findAll();
+
         for (User user : users) {
             if (user.getUsername().equals(username)) {
                 model.addAttribute("title", "Try again");
@@ -232,6 +205,8 @@ public class MainController {
             model.addAttribute("title", "Try again");
             model.addAttribute(newUser);
             model.addAttribute("areas", Seed.Area.values());
+            System.out.println("++" + password);
+            System.out.println("--" + verifyPassword);
             if (password != "" && !password.equals(verifyPassword)) {
                 model.addAttribute("errorMessage", "Passwords do not match.");
             }
@@ -249,8 +224,8 @@ public class MainController {
             sessionIdCookie.setMaxAge(60 * 60);
             response.addCookie(sessionIdCookie);
 
-
-            // save data to database
+            //hashes password before saving to User
+            newUser.setPassword(HashPass.generateHash(password));
             newUser.setSessionId(sessionId);
             userDao.save(newUser);
 
@@ -288,6 +263,9 @@ public class MainController {
 
         Packet newPacket = new Packet();
         User currentUser = userDao.findOne(userId);
+        if (currentUser.getPacket() != null){
+            newPacket = currentUser.getPacket();
+        }
         newPacket.setUser(currentUser);
         packetDao.save(newPacket);
         //2 lists, 1 needed for packet and another to remove Seeds from display list
@@ -351,8 +329,6 @@ public class MainController {
         // change your password
 
        User aUser = (User) request.getSession().getAttribute("user");
-       //User aUser = userId.getId();
-       //User aUser = userDao.findById(userId);
 
         if (aUser != null) {
             model.addAttribute("user", aUser);
@@ -376,9 +352,11 @@ public class MainController {
         //update changes to user in database, save AND commit to it
         //return the same page with the update information displayed
 
-        //Integer userId = (Integer) httpSession.getAttribute("user_id");
-        //User aUser = userDao.findById(userId);
         User aUser = (User) request.getSession().getAttribute("user");
+        Boolean AreaChanged = false;
+        if ((aUser.getArea() != user.getArea())){
+            AreaChanged = true;
+        }
 
         if (errors.hasErrors()) {
             model.addAttribute("user", user);
@@ -388,29 +366,47 @@ public class MainController {
         } else {
             //SAVE CHANGED INFO
 
-
             //take user form session, and use validated fields to take new values
             if (!(aUser.getPhoneNumber().equals(user.getPhoneNumber()))) {
                 model.addAttribute("phoneNumberChangedMessage", "Phone number has been changed.");
             }
             aUser.setPhoneNumber(user.getPhoneNumber());
             // empty seed packet if user changes area
-            if (aUser.getArea() != user.getArea()) {
+            if (AreaChanged) {
                 Packet aPacket = packetDao.findByUserId(aUser.getId());
-                List<SeedInPacket> seedsToRemove = aPacket.getSeeds();
-                for (Seed seed : seedsToRemove) {
-                    seedInPacketDao.delete((SeedInPacket) seed);
+                if (aPacket != null) {
+                    List<SeedInPacket> seedsToRemove = aPacket.getSeeds();
+                    for (SeedInPacket seed : seedsToRemove) {
+                        seedInPacketDao.delete((SeedInPacket) seed);
+                    }
                 }
-                //must delete packet to avoid multiples with same user_id => crash table
-                packetDao.delete(aPacket);
-                model.addAttribute("areaChangedMessage", "Area has been changed.");
             }
 
-            aUser.setArea(user.getArea());
-            aUser.setPassword(user.getPassword());
+            //must delete packet to avoid multiples with same user_id => crash table
+            //packetDao.delete(aPacket);
+            //model.addAttribute("title", "New area!");
+            //model.addAttribute("user", user);
+            //model.addAttribute("seeds", seedDao.findByArea(user.getArea()));
 
-            userDao.save(aUser);
-            request.getSession().setAttribute("user", aUser);
+            //return "/seed-edit";
+
+            //model.addAttribute("areaChangedMessage", "Area has been changed.");
+
+        }
+
+        aUser.setArea(user.getArea());
+        //aUser.setPassword(user.getPassword());
+
+        userDao.save(aUser);
+        request.getSession().setAttribute("user", aUser);
+
+        if (AreaChanged) {
+            model.addAttribute("title", "New area!");
+            model.addAttribute("user", aUser);
+            model.addAttribute("seeds", seedDao.findByArea(aUser.getArea()));
+
+            return "/seed-edit";
+        } else {
 
             model.addAttribute("user", aUser);
             model.addAttribute("areas", Seed.Area.values());
@@ -418,8 +414,9 @@ public class MainController {
             return "/edit-profile";
 
         }
-
     }
+
+
 
     @RequestMapping(value = "/change-password", method = RequestMethod.GET)
     public String changePassword(Model model, HttpServletRequest request){
@@ -432,18 +429,22 @@ public class MainController {
         } else {
             //if no current user, redirect to splash page
             //nothing to edit if user is not logged in
-            model.addAttribute("title", "Welcome to JustinThyme");
+            model.addAttribute("title", "Welcome");
             return "splash";
         }
     }
 
     @RequestMapping(value = "/change-password", method = RequestMethod.POST)
-    public String changePassword(@ModelAttribute @Valid User user, Errors errors, Model model, String password, String newPassword,
+    public String changePassword(@ModelAttribute @Valid User user, Errors errors, Model model,String password, String newPassword,
                                        String verifyNewPassword, HttpServletRequest request, HttpServletResponse response){
 
         User aUser = (User) request.getSession().getAttribute("user");
 
-        if (!password.equals(aUser.getPassword())) {
+        //hashes input password and checks against stored password
+
+        String checkPass = HashPass.generateHash(password);
+        String realPass = new String(aUser.getPassword());
+        if (!checkPass.equals(realPass)) {
             model.addAttribute("title", "Try again");
             model.addAttribute("passwordErrorMessage", "Incorrect password");
             //model.addAttribute(user);
@@ -466,7 +467,16 @@ public class MainController {
         }
 
         //model.addAttribute(user);
-        aUser.setPassword(newPassword);
+        //sets new pass
+//        String saltyPhrase = "this-is-some-salty-stuff";
+//        byte[] salt = saltyPhrase.getBytes();
+//        char[] passyChars = newPassword.toCharArray();
+//        byte[] newHashedPassword = HashPass.hashPass(passyChars, salt, 2, 256);
+       // String newHashedPassword = HashPass.generateHash(newPassword);
+
+        //if everything valid then hash new password and save
+        String newHash = HashPass.generateHash(newPassword);
+        aUser.setPassword(newHash);
         userDao.save(aUser);
 
         //Remove cookies
@@ -482,11 +492,6 @@ public class MainController {
         return "redirect:";
     }
 
-
-    @RequestMapping(value="/welcome-user-temp")
-    public String tempHolder() {
-        return "/welcome-user-temp";
-    }
 
     @RequestMapping(value ="/welcome-user", method = RequestMethod.GET)
     public String dashboard (Model model, HttpServletRequest request){
@@ -621,10 +626,6 @@ public class MainController {
             }
         }
 
-//     @RequestMapping(value="edit-profile")
-//     public String tempPlaceHolder() {
-//         return "/edit-profile";
-//     }
 
     }
 
