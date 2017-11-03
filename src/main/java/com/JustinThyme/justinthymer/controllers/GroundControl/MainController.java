@@ -278,7 +278,7 @@ public class MainController {
 
 
     @RequestMapping(value = "/seed-edit", method = RequestMethod.POST)
-    public String seedListing(HttpSession session, Model model, @RequestParam int[] seedIds,
+    public String seedListing(HttpSession session, Model model, @RequestParam (required = false)int[] seedIds,
                               Integer userId) {
 
         Packet newPacket = new Packet();
@@ -294,17 +294,25 @@ public class MainController {
         List<Seed> pickedSeedsAsSeeds = new ArrayList<>();
 
         //goes through list of chosen seeds and adds them to user's packet and sets reminder
-        for (int seedId : seedIds) {
-            Seed seedPicked = seedDao.findOne(seedId);
-            pickedSeedsAsSeeds.add(seedPicked);
+        if (seedIds == null){
+            model.addAttribute(new Packet());
+            model.addAttribute("seeds", seedDao.findByArea(currentUser.getArea()));
+            model.addAttribute("user", currentUser);
+            model.addAttribute("title", "pick at least ONE seed!");
+            return "/seed-edit";
+        } else {
+            for (int seedId : seedIds) {
+                Seed seedPicked = seedDao.findOne(seedId);
+                pickedSeedsAsSeeds.add(seedPicked);
 
             //note conversion using factory
-            SeedInPacket seedToPlant = SeedToPacketSeed.fromSeedToPacket(seedPicked, newPacket);
-            seedToPlant.setReminder(seedToPlant);
-            seedsToPlant.add(seedToPlant);
-            seedInPacketDao.save(seedToPlant);
-
+                SeedInPacket seedToPlant = SeedToPacketSeed.fromSeedToPacket(seedPicked, newPacket);
+                seedToPlant.setReminder(seedToPlant);
+                seedsToPlant.add(seedToPlant);
+                seedInPacketDao.save(seedToPlant);
+            }
         }
+
 
         //after all seeds have been converted and reminder turned on, set to packet
         newPacket.setSeeds(seedsToPlant);
@@ -403,12 +411,12 @@ public class MainController {
 
 
                 //must delete packet to avoid multiples with same user_id => crash table
-                packetDao.delete(aPacket);
-                model.addAttribute("title", "New area!");
-                model.addAttribute("user", aUser);
-                model.addAttribute("seeds", seedDao.findByArea(aUser.getArea()));
-
-                return "/seed-edit";
+//                packetDao.delete(aPacket);
+//                model.addAttribute("title", "New area!");
+//                model.addAttribute("user", aUser);
+//                model.addAttribute("seeds", seedDao.findByArea(aUser.getArea()));
+//
+//                return "/seed-edit";
 
                 //model.addAttribute("areaChangedMessage", "Area has been changed.");
 
@@ -557,6 +565,7 @@ public class MainController {
 
     @RequestMapping (value ="/welcome-user", method = RequestMethod.POST)
     public String dashboardAdd (Model model , @RequestParam(required = false)int[] seedToRemoveIds,
+                                @RequestParam SeedInPacket ONOFF,
                                 @RequestParam(required = false)int[] seedIds,
                                 @RequestParam Integer userId){
 
@@ -569,6 +578,14 @@ public class MainController {
 
 
 
+        //note change reminder ON Off
+//
+//        if (ONOFF == ) {
+//                for (SeedInPacket seedToTurnOff : ONOFF) {
+//                    //SeedInPacket seedToTurnOff = seedInPacketDao.findById(id);
+//                    seedToTurnOff.removeReminder(seedToTurnOff);
+//            }
+//        }
         //remove seeds from packet if they are selected
         //for (int seedToRemoveId : seedToRemoveIds) {
             if (seedToRemoveIds != null) {
