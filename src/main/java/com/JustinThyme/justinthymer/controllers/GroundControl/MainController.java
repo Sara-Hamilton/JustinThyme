@@ -258,9 +258,17 @@ public class MainController {
 
 
     @RequestMapping(value = "/seed-edit", method = RequestMethod.POST)
-    public String seedListing(HttpSession session, Model model, @RequestParam int[] seedIds,
+    public String seedListing(HttpSession session, Model model, @RequestParam(required=false) int[] seedIds,
                               Integer userId) {
 
+        if(seedIds == null){
+            User newUser = (User) session.getAttribute("user");
+            Seed.Area area = newUser.getArea();
+            model.addAttribute(new Packet());
+            model.addAttribute("seeds", seedDao.findByArea(area));
+            model.addAttribute("user", newUser);
+            return "/seed-edit";
+        }
         Packet newPacket = new Packet();
         User currentUser = userDao.findOne(userId);
         if (currentUser.getPacket() != null){
@@ -501,7 +509,7 @@ public class MainController {
         if(user == null){
             model.addAttribute("title", "Welcome to JustinThyme");
             return "/splash";
-        } else{
+        } else {
             Packet aPacket = packetDao.findByUserId(user.getId());
             // redirects user to seed-edit page if they have no seeds in their packet
             if (aPacket == null) {
