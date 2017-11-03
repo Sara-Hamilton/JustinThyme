@@ -10,15 +10,14 @@
 <nav th:replace="fragments :: navigation"></nav>
 
 
-<!--<div class="container-fluid" >-->
+<div class="container-fluid" >
     <h1 th:text="|Welcome ${user.username}|">Default welcome</h1>
 <table class="table">
-
-
     <tr>
         <th>Name</th>
         <th>Plant Date</th>
         <th>Reminder</th>
+        <th></th>
     </tr>
 
     <form method="post" action="welcome-user">
@@ -30,7 +29,8 @@
 
     <td th:if="${seed.getReminder() == true}" th:text="ON"></td>
     <td th:if="${seed.getReminder() == false}" th:text="OFF"></td>
-        <td><button type="submit" name="seedToRemoveIds" th:value="${seed.getId()}">Remove</button></td>
+        <td><button type="submit" class="btn btn-sm btn-primary" name="seedToRemoveIds" th:value="${seed.getId()}">
+             <i class="fa fa-trash" aria-hidden="true"></i> Remove</button></td>
         <!--<td><input type="submit" name="seedToRemoveIds" value="Remove"/></td>-->
 
 
@@ -48,10 +48,12 @@
         <label th:for="${seed.name}" th:text="${seed.name}"></label></li>
     </ul>
     <input type="hidden" th:value="${user.getId()}" name="userId" />
-    <input type="submit" value ="Add more"/>
+    <input type="submit" class="btn btn-sm btn-primary" value ="Add more"/>
 
 
 </form>
+</div>
+
 
 
 

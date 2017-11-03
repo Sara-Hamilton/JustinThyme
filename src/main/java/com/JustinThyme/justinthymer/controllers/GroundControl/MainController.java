@@ -388,6 +388,20 @@ public class MainController {
                         seedInPacketDao.delete((SeedInPacket) seed);
                     }
                 }
+
+
+
+                //must delete packet to avoid multiples with same user_id => crash table
+                packetDao.delete(aPacket);
+                model.addAttribute("title", "New area!");
+                model.addAttribute("user", aUser);
+                model.addAttribute("seeds", seedDao.findByArea(aUser.getArea()));
+
+                return "/seed-edit";
+
+                //model.addAttribute("areaChangedMessage", "Area has been changed.");
+
+
             }
 
             //must delete packet to avoid multiples with same user_id => crash table
