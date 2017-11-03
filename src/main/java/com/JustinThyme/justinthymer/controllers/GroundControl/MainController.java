@@ -395,7 +395,7 @@ public class MainController {
                 packetDao.delete(aPacket);
                 model.addAttribute("title", "New area!");
                 model.addAttribute("user", aUser);
-                model.addAttribute("seeds", seedDao.findByArea(updatedUser.getArea()));
+                model.addAttribute("seeds", seedDao.findByArea(aUser.getArea()));
 
                 return "/seed-edit";
 
