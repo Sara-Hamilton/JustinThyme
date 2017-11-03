@@ -41,7 +41,7 @@
 
 
 <form method="post" action = "welcome-user">
-    <h3>Here are some more seeds that grow in your area:</h3>
+    <h3 th:text="|Here are some seeds that grow in your area: ${user.area.name}|">Here are some more seeds that grow in your area:</h3>
     <ul th:each="seed : ${seedsLeft}" class="list-unstyled">
 
         <li><input th:id="${seed.name}"  type="checkbox" name="seedIds" th:value="${seed.getId()}"/>

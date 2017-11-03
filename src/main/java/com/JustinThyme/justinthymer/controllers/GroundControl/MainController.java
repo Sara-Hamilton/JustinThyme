@@ -74,13 +74,12 @@ public class MainController {
         Iterable<User> users = userDao.findAll();
 
         for (User user : users) {
+
             String salt = user.getSalt();
-            System.out.println("SALT: " + salt);
-            System.out.println("Password: " + password);
             String enteredPassword = HashPass.generateHash(salt + password);
-            System.out.println("<<<<<<<<<<<<<<<<" + user.getPassword());
-            System.out.println(">>>>>>>>>>>>>>>>>>>>" + enteredPassword);
+
             if (user.getUsername().equals(username) && user.getPassword().equals(enteredPassword)) {
+
                 model.addAttribute("user", user);
                 // add user to session
                 request.getSession().setAttribute("user", user);
@@ -118,7 +117,9 @@ public class MainController {
                 for (SeedInPacket seedInPacket : userPacket.getSeeds()) {
                     String name = seedInPacket.getName();
                     List<Seed> aSeed = seedDao.findByName(name);
+
                     //returns a list of all the seeds with that name, most efficient?
+
                     seedsToRemove.addAll(aSeed);
                 }
 
@@ -135,8 +136,6 @@ public class MainController {
 
                 return "/welcome-user";
             } else {
-                System.out.println("<<<<<<<<<<<<<<<<" + user.getPassword());
-                System.out.println(">>>>>>>>>>>>>>>>>>>>" + enteredPassword);
                 model.addAttribute("title", "No user by that name or incorrect password!");
             }
         }
@@ -238,12 +237,14 @@ public class MainController {
             response.addCookie(sessionIdCookie);
 
             //hashes password before saving to User
+
             newUser.setPassword(HashPass.generateHash(salt + password));
             //byte[] salt = HashPass.saltShaker();
             //String saltyHash = HashPass.saltHash(password);
             //newUser.setSalt(salt);
             //newUser.setPassword(saltyHash);
             userDao.save(newUser);
+
 
             newUser.setSessionId(sessionId);
             userDao.save(newUser);
@@ -282,6 +283,9 @@ public class MainController {
 
         Packet newPacket = new Packet();
         User currentUser = userDao.findOne(userId);
+        if (currentUser.getPacket() != null){
+            newPacket = currentUser.getPacket();
+        }
         newPacket.setUser(currentUser);
         packetDao.save(newPacket);
         //2 lists, 1 needed for packet and another to remove Seeds from display list
@@ -369,6 +373,10 @@ public class MainController {
         //return the same page with the update information displayed
 
         User aUser = (User) request.getSession().getAttribute("user");
+        Boolean AreaChanged = false;
+        if ((aUser.getArea() != user.getArea())){
+            AreaChanged = true;
+        }
 
         if (errors.hasErrors()) {
             model.addAttribute("user", user);
@@ -384,12 +392,15 @@ public class MainController {
             }
             aUser.setPhoneNumber(user.getPhoneNumber());
             // empty seed packet if user changes area
-            if (aUser.getArea() != user.getArea()) {
+            if (AreaChanged) {
                 Packet aPacket = packetDao.findByUserId(aUser.getId());
-                List<SeedInPacket> seedsToRemove = aPacket.getSeeds();
-                for (Seed seed : seedsToRemove) {
-                    seedInPacketDao.delete((SeedInPacket) seed);
+                if (aPacket != null) {
+                    List<SeedInPacket> seedsToRemove = aPacket.getSeeds();
+                    for (SeedInPacket seed : seedsToRemove) {
+                        seedInPacketDao.delete((SeedInPacket) seed);
+                    }
                 }
+
 
                 //must delete packet to avoid multiples with same user_id => crash table
                 packetDao.delete(aPacket);
@@ -403,11 +414,31 @@ public class MainController {
 
             }
 
-            aUser.setArea(user.getArea());
-            aUser.setPassword(user.getPassword());
+            //must delete packet to avoid multiples with same user_id => crash table
+            //packetDao.delete(aPacket);
+            //model.addAttribute("title", "New area!");
+            //model.addAttribute("user", user);
+            //model.addAttribute("seeds", seedDao.findByArea(user.getArea()));
 
-            userDao.save(aUser);
-            request.getSession().setAttribute("user", aUser);
+            //return "/seed-edit";
+
+            //model.addAttribute("areaChangedMessage", "Area has been changed.");
+
+        }
+
+        aUser.setArea(user.getArea());
+        //aUser.setPassword(user.getPassword());
+
+        userDao.save(aUser);
+        request.getSession().setAttribute("user", aUser);
+
+        if (AreaChanged) {
+            model.addAttribute("title", "New area!");
+            model.addAttribute("user", aUser);
+            model.addAttribute("seeds", seedDao.findByArea(aUser.getArea()));
+
+            return "/seed-edit";
+        } else {
 
             model.addAttribute("user", aUser);
             model.addAttribute("areas", Seed.Area.values());
@@ -415,8 +446,9 @@ public class MainController {
             return "/edit-profile";
 
         }
-
     }
+
+
 
     @RequestMapping(value = "/change-password", method = RequestMethod.GET)
     public String changePassword(Model model, HttpServletRequest request){
@@ -440,12 +472,13 @@ public class MainController {
 
         User aUser = (User) request.getSession().getAttribute("user");
 
+
         String salt = aUser.getSalt();
         //hashes input password and checks against stored password
 
         String checkPass = HashPass.generateHash(salt + password);
-       // String realPass = new String(aUser.getPassword());
         String realPass = aUser.getPassword();
+
         if (!checkPass.equals(realPass)) {
             model.addAttribute("title", "Try again");
             model.addAttribute("passwordErrorMessage", "Incorrect password");
@@ -468,12 +501,8 @@ public class MainController {
             return "/change-password";
         }
 
-        //if everything valid then hash new password with fresh salt and save
-        //String newSalt = HashPass.saltShaker();
-        //String newHash = HashPass.generateHash(newSalt + password);
-        //String saltyHash = HashPass.saltHash(newPassword);
-        //aUser.setPassword(newHash);
-       // aUser.setSalt(newSalt);
+
+        //note keeps original salt
         String newHash = HashPass.generateHash(salt + newPassword);
         aUser.setPassword(newHash);
         userDao.save(aUser);

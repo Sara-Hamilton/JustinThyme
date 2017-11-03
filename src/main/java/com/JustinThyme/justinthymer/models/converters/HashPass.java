@@ -5,14 +5,10 @@ import java.security.MessageDigest;
 import java.security.SecureRandom;
 
 
+
 //note below derived from https://dzone.com/articles/storing-passwords-java-web
 
 public class HashPass {
-
-
-
-    //Map<String, String> SALTEDHASH = new HashMap<String, String>();
-    //public static final String SALT = "this-is-some-salty-stuff";
 
     public static String saltShaker() {
         SecureRandom random = new SecureRandom();
@@ -20,9 +16,6 @@ public class HashPass {
         random.nextBytes(salt);
         return salt.toString();
     }
-
-    //byte[] salt = saltyPhrase.getBytes();
-
 
 
     public static String saltHash(String password) {
@@ -36,7 +29,9 @@ public class HashPass {
         StringBuilder hash = new StringBuilder();
 
         try {
+
             MessageDigest sha = MessageDigest.getInstance("SHA-512");
+
             byte[] hashedBytes = sha.digest(password.getBytes());
             char[] digits = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
                     'a', 'b', 'c', 'd', 'e', 'f' };
