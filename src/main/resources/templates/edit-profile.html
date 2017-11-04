@@ -34,7 +34,7 @@
                 </div>
 
 
-<h1 th:text="${title}"></h1>
+<!--<h1 th:text="${title}"></h1>-->
 
 <form method="post" style="max-width:600px;" th:object="${user}">
 
@@ -43,8 +43,6 @@
         <input class="hidden" th:value="*{username}" th:field="*{username}" type="text" />
         <span th:errors="*{username}" class="error"></span>
     </div>
-
-
     <div>
         <a href="/JustinThyme/change-password">Change password</a>
         <p></p>
@@ -82,9 +80,7 @@
                 <input type="submit" value="Submit"/>
             </form>
 
-
-            <h3><a href="/JustinThyme/unsubscribe">Unsubscribe</a></h3>
-        </div>
+            </form></div>
     </div>
 </div>
 

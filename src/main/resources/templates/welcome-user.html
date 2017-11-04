@@ -23,14 +23,9 @@
     <form method="post" action="welcome-user">
 
     <tr th:each="seed :${seeds}">
-    <!--<td th:text="${seed.name}" type="checkbox" name="seedToRemoveIds" th:value="${seed.getId()}"></td>-->
         <td th:text="${seed.name}"></td>
     <td th:text="${seed.plantDate}"></td>
 
-
-        <!--<td><button type="submit" name="ON" th:value="${seed.getId()}" th:if="${seed.getReminder() == true}" th:text="ON"></button></td>
-        <td><button type="submit" name="OFF" th:value="${seed.getId()}" th:if="${seed.getReminder() == false}" th:text="OFF"></button></td>
-        <td><button type="submit" name="ON" th:value="${seed.getId()}" th:if="${seed.getReminder() == true}" th:text="ON"></button>-->
         <td>
         <div class="btn-group btn-toggle">
             <button class="btn btn-default" type="submit" name="ON" th:value="${seed.getId()}" th:if="${seed.getReminder() == true}">ON</button>
@@ -38,12 +33,7 @@
         </div>
         </td>
 
-    <!--<td th:if="${seed.getReminder() == true}" th:text="ON"></td>-->
-    <!--<td th:if="${seed.getReminder() == false}" th:text="OFF"></td>-->
         <td><button type="submit" name="seedToRemoveIds" th:value="${seed.getId()}">Remove</button></td>
-
-        <!--<td><input type="submit" name="seedToRemoveIds" value="Remove"/></td>-->
-
 
         <input type="hidden" th:value="${user.getId()}" name="userId" />
     </tr>

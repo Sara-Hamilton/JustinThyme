@@ -13,7 +13,6 @@ import com.JustinThyme.justinthymer.models.forms.Packet;
 import com.JustinThyme.justinthymer.models.forms.Seed;
 import com.JustinThyme.justinthymer.models.forms.SeedInPacket;
 import com.JustinThyme.justinthymer.models.forms.User;
-import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -27,10 +26,10 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
-import java.nio.charset.StandardCharsets;
+
 import java.util.*;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
+
 
 
 @Controller
@@ -48,8 +47,6 @@ public class MainController {
     private PacketDao packetDao;
 
     @Autowired
-//     private HttpSession httpSession;
-
     private SeedInPacketDao seedInPacketDao;
 
 
@@ -70,7 +67,6 @@ public class MainController {
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public String login(Model model, @RequestParam String username, @RequestParam String password, HttpServletResponse response, HttpServletRequest request) {
 
-        //model.addAttribute("users", userDao.findAll());
         Iterable<User> users = userDao.findAll();
 
         for (User user : users) {
@@ -99,9 +95,6 @@ public class MainController {
                 // save data to database
                 user.setSessionId(sessionId);
                 userDao.save(user);
-
-//                 //TODO set sessionID and cookie to something other than username for security
-//                 httpSession.setAttribute("user_id", user.getId());
 
                 // gets the packet associated with that user for display
                 Packet userPacket = packetDao.findByUserId(user.getId());
@@ -237,15 +230,7 @@ public class MainController {
             response.addCookie(sessionIdCookie);
 
             //hashes password before saving to User
-
             newUser.setPassword(HashPass.generateHash(salt + password));
-            //byte[] salt = HashPass.saltShaker();
-            //String saltyHash = HashPass.saltHash(password);
-            //newUser.setSalt(salt);
-            //newUser.setPassword(saltyHash);
-            userDao.save(newUser);
-
-
             newUser.setSessionId(sessionId);
             userDao.save(newUser);
 
@@ -253,11 +238,6 @@ public class MainController {
             Seed.Area area = newUser.getArea();
             List<Seed> seeds = new ArrayList<>();
             seeds = seedDao.findByArea(area);
-
-
-//             //use http session to create session object with name user_id
-//             httpSession.setAttribute("user_id", newUser.getId());
-
 
             request.getSession().setAttribute("user", newUser);
 
@@ -314,8 +294,7 @@ public class MainController {
             for (int seedId : seedIds) {
                 Seed seedPicked = seedDao.findOne(seedId);
                 pickedSeedsAsSeeds.add(seedPicked);
-
-            //note conversion using factory
+                //uses conversion method to transmute seed to seedInPacket by joining seed to specific packet
                 SeedInPacket seedToPlant = SeedToPacketSeed.fromSeedToPacket(seedPicked, newPacket);
                 seedToPlant.setReminder(seedToPlant);
                 seedsToPlant.add(seedToPlant);
@@ -332,7 +311,7 @@ public class MainController {
         String number = currentUser.getPhoneNumber();
         Timer timer = new Timer(true); //daemon set to true
 
-        //needed for display note see above @108
+        //needed for display, see above @108
         Seed.Area area = currentUser.getArea();
         List<Seed> notChosenSeeds = seedDao.findByArea(area);
         notChosenSeeds.removeAll(pickedSeedsAsSeeds);
@@ -361,10 +340,7 @@ public class MainController {
 
     @RequestMapping(value = "/edit-profile", method = RequestMethod.GET)
     public String editProfilePreferences(Model model, HttpServletRequest request) {
-        // display form with relevant options
-        // change your area?
-        // change your cell phone
-        // change your password
+        // enables user to change password, phone_number, area, and gives un-subscribe option
 
        User aUser = (User) request.getSession().getAttribute("user");
 
@@ -388,7 +364,6 @@ public class MainController {
         //process form, capture all user input into fields
         //make operative changes upon user's information in the database
         //update changes to user in database, save AND commit to it
-        //return the same page with the update information displayed
 
         User aUser = (User) request.getSession().getAttribute("user");
         Boolean AreaChanged = false;
@@ -409,46 +384,20 @@ public class MainController {
                 model.addAttribute("phoneNumberChangedMessage", "Phone number has been changed.");
             }
             aUser.setPhoneNumber(user.getPhoneNumber());
-            // empty seed packet if user changes area
+            // note empty seed packet if user changes area, but user keeps packet
             if (AreaChanged) {
                 Packet aPacket = packetDao.findByUserId(aUser.getId());
                 if (aPacket != null) {
                     List<SeedInPacket> seedsToRemove = aPacket.getSeeds();
                     for (SeedInPacket seed : seedsToRemove) {
-                        seedInPacketDao.delete((SeedInPacket) seed);
+                        seedInPacketDao.delete(seed);
                     }
                 }
 
-
-
-                //must delete packet to avoid multiples with same user_id => crash table
-//                packetDao.delete(aPacket);
-//                model.addAttribute("title", "New area!");
-//                model.addAttribute("user", aUser);
-//                model.addAttribute("seeds", seedDao.findByArea(aUser.getArea()));
-//
-//                return "/seed-edit";
-
-                //model.addAttribute("areaChangedMessage", "Area has been changed.");
-
-
             }
-
-            //must delete packet to avoid multiples with same user_id => crash table
-            //packetDao.delete(aPacket);
-            //model.addAttribute("title", "New area!");
-            //model.addAttribute("user", user);
-            //model.addAttribute("seeds", seedDao.findByArea(user.getArea()));
-
-            //return "/seed-edit";
-
-            //model.addAttribute("areaChangedMessage", "Area has been changed.");
-
         }
 
         aUser.setArea(user.getArea());
-        //aUser.setPassword(user.getPassword());
-
         userDao.save(aUser);
         request.getSession().setAttribute("user", aUser);
 
@@ -502,12 +451,10 @@ public class MainController {
         if (!checkPass.equals(realPass)) {
             model.addAttribute("title", "Try again");
             model.addAttribute("passwordErrorMessage", "Incorrect password");
-            //model.addAttribute(user);
             return "/change-password";
         }
         else if (!newPassword.equals(verifyNewPassword) || newPassword.length() < 6 || newPassword.equals(aUser.getPassword())) {
             model.addAttribute("title", "Try again");
-            //model.addAttribute(user);
             if (newPassword.length() < 6) {
                 model.addAttribute("newPasswordErrorMessage", "Passwords must be at least 6 characters long.");
             }
@@ -538,7 +485,7 @@ public class MainController {
 
 
         model.addAttribute("title", "Login with New Password");
-        return "/splash";
+        return "/login";
     }
 
 
@@ -638,7 +585,6 @@ public class MainController {
             seedsToRemove.addAll(aSeed);
         }
 
-        //TODO put if conditional to removeReminder form seedInPacket from radio button in form
 
         List<Seed> seedsLeft = seedDao.findByArea(user.getArea());
         seedsLeft.removeAll(seedsToRemove);
