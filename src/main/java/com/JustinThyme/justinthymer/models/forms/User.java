@@ -28,6 +28,8 @@ public class User {
     @Size(min=6, message="Passwords must be at least six characters.")
     private String password;
 
+
+    private String salt;
     // standard phone number format for North America
 
     @Pattern(regexp = "[(][2-9][0-8][0-9][)][2-9][0-9]{2}-[0-9]{4}", message="Not a valid number, use (XXX)XXX-XXXX format")
@@ -38,9 +40,10 @@ public class User {
 
     private String sessionId;
 
-    public User(String username, String password, Seed.Area area, String phoneNumber, String sessionId) {
+    public User(String username, String password, String salt, Seed.Area area, String phoneNumber, String sessionId) {
         this.username = username;
         this.password = password;
+        this.salt = salt;
         this.area = area;
         this.phoneNumber = phoneNumber;
         this.sessionId = sessionId;
@@ -89,6 +92,14 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getSalt() {
+        return salt;
+    }
+
+    public void setSalt(String salt) {
+        this.salt = salt;
     }
 
     public Packet getPacket() {

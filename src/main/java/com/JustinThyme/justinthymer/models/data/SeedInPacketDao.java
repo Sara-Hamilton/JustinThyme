@@ -20,6 +20,8 @@ public interface SeedInPacketDao extends CrudRepository<SeedInPacket, Integer> {
 
     SeedInPacket findById(int id);
 
+    SeedInPacket findByName(String name);
+
     //List<SeedInPacket> findAll();
 
 
