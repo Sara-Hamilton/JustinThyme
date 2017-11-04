@@ -565,7 +565,8 @@ public class MainController {
 
     @RequestMapping (value ="/welcome-user", method = RequestMethod.POST)
     public String dashboardAdd (Model model , @RequestParam(required = false)int[] seedToRemoveIds,
-                                @RequestParam SeedInPacket ONOFF,
+                                @RequestParam(required = false)int[] ON,
+                                @RequestParam(required = false)int[] OFF,
                                 @RequestParam(required = false)int[] seedIds,
                                 @RequestParam Integer userId){
 
@@ -578,16 +579,22 @@ public class MainController {
 
 
 
-        //note change reminder ON Off
-//
-//        if (ONOFF == ) {
-//                for (SeedInPacket seedToTurnOff : ONOFF) {
-//                    //SeedInPacket seedToTurnOff = seedInPacketDao.findById(id);
-//                    seedToTurnOff.removeReminder(seedToTurnOff);
-//            }
-//        }
+        //changes reminder ON Off if either button pushed
+        if (ON != null) {
+            for (int id : ON) {
+                SeedInPacket seedToTurnOff = seedInPacketDao.findById(id);
+                seedToTurnOff.removeReminder(seedToTurnOff);
+            }
+        }
+        if (OFF != null) {
+            for (int id : OFF) {
+                SeedInPacket seedToTurnOn = seedInPacketDao.findById(id);
+                seedToTurnOn.setReminder(seedToTurnOn);
+            }
+        }
+
         //remove seeds from packet if they are selected
-        //for (int seedToRemoveId : seedToRemoveIds) {
+
             if (seedToRemoveIds != null) {
                 for (int id : seedToRemoveIds) {
                     SeedInPacket seedToGo = seedInPacketDao.findById(id);
