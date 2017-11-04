@@ -29,8 +29,15 @@
     <td th:text="${seed.plantDate}"></td>
 
 
-        <td><button type="submit" name="ON" th:value="${seed.getId()}" th:if="${seed.getReminder() == true}" th:text="ON"></button></td>
+        <!--<td><button type="submit" name="ON" th:value="${seed.getId()}" th:if="${seed.getReminder() == true}" th:text="ON"></button></td>
         <td><button type="submit" name="OFF" th:value="${seed.getId()}" th:if="${seed.getReminder() == false}" th:text="OFF"></button></td>
+        <td><button type="submit" name="ON" th:value="${seed.getId()}" th:if="${seed.getReminder() == true}" th:text="ON"></button>-->
+        <td>
+        <div class="btn-group btn-toggle">
+            <button class="btn btn-default" type="submit" name="ON" th:value="${seed.getId()}" th:if="${seed.getReminder() == true}">ON</button>
+            <button class="btn btn-primary active" type="submit" name="OFF" th:value="${seed.getId()}" th:if="${seed.getReminder() == false}">OFF</button>
+        </div>
+        </td>
 
     <!--<td th:if="${seed.getReminder() == true}" th:text="ON"></td>-->
     <!--<td th:if="${seed.getReminder() == false}" th:text="OFF"></td>-->
