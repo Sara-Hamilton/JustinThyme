@@ -67,12 +67,12 @@ position: relative;
     font-weight:bold;
 }
 
-.btn.btn-primary.btn-sm {
+.btn.btn-primary.btn-sm, .btn.btn-primary.btn-md{
     background-color:#2dcf5a;
     border:0;
 }
 
-.btn.btn-primary.btn-sm:hover {
+.btn.btn-primary.btn-sm:hover, .btn.btn-primary.btn-md:hover {
     background-color:#233930;
     border:0;
 }
@@ -100,13 +100,24 @@ ul.leaf {
     list-style-type:none;
     }
 
-
 ul.leaf:before {
     font-family:FontAwesome;
     content:"\f06c";
     float:left;
     width:1.4em;
 }
+
+.form-control:focus {
+  border-color: #2dcf5a;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(45, 207, 90, 0.6);
+}
+
+a {
+    color:#2dcf5a;}
+
+a:hover, a:active {
+    color:#233930;}
+
 
 
 
