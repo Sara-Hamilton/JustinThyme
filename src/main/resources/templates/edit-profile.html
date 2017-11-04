@@ -27,46 +27,57 @@
                     <span th:errors="*{password}" class="error"></span>
                 </div> -->
 
-
-
-                <div class="form-group">
-                    <label th:for="phoneNumber">Phone Number</label>
-                    <input class="form-control" th:value="*{phoneNumber}" th:field="*{phoneNumber}" type="text" />
-                    <span th:errors="*{phoneNumber}" class="error"></span>
-                </div>
-
-                <div>
-                    <a href="/JustinThyme/change-password">Click here to change your password</a>
-                </div>
-
-                <div class="form-group">
-                    <label th:for="area">Area</label>
-                    <select th:field="*{area}">
-                        <option th:each="area : ${areas}"
-                                th:text="${area.name}"
-                                th:value="${area}"></option>
-                    </select>
-                    <span th:errors="*{area}" class="error"></span>
-                </div>
-
-                <input type="submit" class="btn btn-md btn-primary" value="Submit"/>
-                <a href="/JustinThyme/unsubscribe" class="btn btn-sm btn-danger">Unsubscribe</a>
-
                 <div class="form-group">
                     <label th:for="username"></label>
                     <input class="hidden" th:value="*{username}" th:field="*{username}" type="text" />
                     <span th:errors="*{username}" class="error"></span>
                 </div>
 
+
+    <div>
+        <a href="/JustinThyme/change-password">Change password</a>
+        <p></p>
+    </div>
+
+    <div>
+        <a href="/JustinThyme/unsubscribe">Unsubscribe</a>
+    </div>
+
                 <div class="form-group">
                     <label th:for="password"></label>
                     <input class="hidden" th:value="*{password}" th:field="*{password}" type="text"/>
                     <span th:errors="*{password}" class="error"></span>
                 </div>
+
+
+    <div class="form-group">
+        <label th:for="phoneNumber">Phone Number</label>
+        <input class="form-control" th:value="*{phoneNumber}" th:field="*{phoneNumber}" type="text" />
+        <span th:errors="*{phoneNumber}" class="error"></span>
+        <span class="text-success" th:text="${phoneNumberChangedMessage}"></span>
+    </div>
+
+    <div class="form-group">
+        <label th:for="area">Area</label>
+        <select th:field="*{area}">
+            <option th:each="area : ${areas}"
+                    th:text="${area.name}"
+                    th:value="${area}"></option>
+        </select>
+        <p class="text-warning">Changing area will void all current reminders.</p>
+        <span class="text-success" th:text="${areaChangedMessage}"></span>
+        <span th:errors="*{area}" class="error"></span>
+    </div>
+                <input type="submit" value="Submit"/>
             </form>
+
+
+            <h3><a href="/JustinThyme/unsubscribe">Unsubscribe</a></h3>
         </div>
     </div>
 </div>
+
+<!-- <h3><a href="/JustinThyme/unsubscribe">Unsubscribe</a></h3> -->
 
 <div th:replace="fragments :: javascript"></div>
 </body>
