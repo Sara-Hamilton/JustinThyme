@@ -13,7 +13,7 @@
 <div class="container-fluid" >
     <h1 th:text="|Welcome ${user.username}|">Default welcome</h1>
     <table class="table">
-        <tr>
+        <tr th:if="${seeds.size()!=0}">
             <th>Name</th>
             <th>Plant Date</th>
             <th>Reminder</th>

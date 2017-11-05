@@ -196,9 +196,7 @@ public class MainController {
         return "/seed-edit";
     }
 
-
     @RequestMapping(value = "/seed-edit", method = RequestMethod.POST)
-
     public String seedListing(HttpSession session, Model model, @RequestParam (required = false)int[] seedIds,
                               Integer userId) {
 
@@ -261,7 +259,6 @@ public class MainController {
 
         return "/welcome-user";
     }
-
 
     @RequestMapping(value = "/edit-profile", method = RequestMethod.GET)
     public String editProfilePreferences(Model model, HttpServletRequest request) {
