@@ -13,6 +13,7 @@ import com.JustinThyme.justinthymer.models.forms.Packet;
 import com.JustinThyme.justinthymer.models.forms.Seed;
 import com.JustinThyme.justinthymer.models.forms.SeedInPacket;
 import com.JustinThyme.justinthymer.models.forms.User;
+import org.codehaus.groovy.util.HashCodeHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -441,7 +442,6 @@ public class MainController {
 
         User aUser = (User) request.getSession().getAttribute("user");
 
-
         String salt = aUser.getSalt();
         //hashes input password and checks against stored password
 
@@ -453,12 +453,12 @@ public class MainController {
             model.addAttribute("passwordErrorMessage", "Incorrect password");
             return "/change-password";
         }
-        else if (!newPassword.equals(verifyNewPassword) || newPassword.length() < 6 || newPassword.equals(aUser.getPassword())) {
+        else if (!newPassword.equals(verifyNewPassword) || newPassword.length() < 6 || newPassword.equals(password)) {
             model.addAttribute("title", "Try again");
             if (newPassword.length() < 6) {
                 model.addAttribute("newPasswordErrorMessage", "Passwords must be at least 6 characters long.");
             }
-            if (newPassword.equals(aUser.getPassword())) {
+            if (newPassword.equals(password)) {
                 model.addAttribute("newPasswordErrorMessage2", "Use a different password.");
             }
             if (newPassword != "" && !newPassword.equals(verifyNewPassword)) {
@@ -472,6 +472,7 @@ public class MainController {
         //note keeps original salt
         String newHash = HashPass.generateHash(salt + newPassword);
         aUser.setPassword(newHash);
+        aUser.setSalt(salt);
         userDao.save(aUser);
 
         //Remove cookies
@@ -484,8 +485,9 @@ public class MainController {
         request.getSession().removeAttribute("user");
 
 
+       // model.addAttribute("username", aUser.username);
         model.addAttribute("title", "Login with New Password");
-        return "/login";
+        return "redirect:login";
     }
 
 
