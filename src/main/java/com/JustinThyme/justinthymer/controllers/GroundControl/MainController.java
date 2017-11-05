@@ -453,12 +453,12 @@ public class MainController {
             model.addAttribute("passwordErrorMessage", "Incorrect password");
             return "/change-password";
         }
-        else if (!newPassword.equals(verifyNewPassword) || newPassword.length() < 6 || newPassword.equals(aUser.getPassword())) {
+        else if (!newPassword.equals(verifyNewPassword) || newPassword.length() < 6 || newPassword.equals(password)) {
             model.addAttribute("title", "Try again");
             if (newPassword.length() < 6) {
                 model.addAttribute("newPasswordErrorMessage", "Passwords must be at least 6 characters long.");
             }
-            if (HashPass.generateHash(newPassword + salt).equals(aUser.getPassword())) {
+            if (newPassword.equals(password)) {
                 model.addAttribute("newPasswordErrorMessage2", "Use a different password.");
             }
             if (newPassword != "" && !newPassword.equals(verifyNewPassword)) {
@@ -487,7 +487,7 @@ public class MainController {
 
        // model.addAttribute("username", aUser.username);
         model.addAttribute("title", "Login with New Password");
-        return "/splash";
+        return "redirect:login";
     }
 
 
