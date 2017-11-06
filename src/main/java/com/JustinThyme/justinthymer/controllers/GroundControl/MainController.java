@@ -111,19 +111,27 @@ public class MainController {
     }
 
     @RequestMapping(value = "/logout", method = RequestMethod.GET)
-    public String logout(Model model) {
-        model.addAttribute("title", "Click here to Logout.");
-        return "/logout";
+    public String logout(Model model, HttpServletRequest request) {
+
+        User aUser = (User) request.getSession().getAttribute("user");
+
+        if (aUser == null) {
+            model.addAttribute("title", "Welcome to JustinThyme");
+            return "splash";
+        } else {
+            model.addAttribute("title", "Click here to Logout.");
+            return "/logout";
+        }
     }
 
     @RequestMapping(value = "/logout", method = RequestMethod.POST)
     public String logout(Model model, HttpServletResponse response, HttpServletRequest request) {
         model.addAttribute("title", "See ya next Thyme!");
 
-        //Remove user from session
-        request.getSession().removeAttribute("user");
+            //Remove user from session
+            request.getSession().removeAttribute("user");
 
-        return "/see-ya";
+            return "/see-ya";
     }
 
 
