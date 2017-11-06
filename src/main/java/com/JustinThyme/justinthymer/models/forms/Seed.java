@@ -3,9 +3,7 @@ package com.JustinThyme.justinthymer.models.forms;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import java.sql.Timestamp;
 import java.util.Date;
-import java.util.List;
 
 
 @Entity
@@ -77,8 +75,6 @@ public class Seed {
         this.season = aSeason;
         //this.plantDate = aDate; note expand with api later perhaps
         this.plantDate = simpleDateGet(aSeason);
-        //this.packets = packets;
-        //this.reminder = false;
     }
 
     public Seed () { }
@@ -120,18 +116,6 @@ public class Seed {
     public Boolean getReminder() {
         return reminder;
     }
-
-
-    //
-//    public void setReminder() {
-//        this.reminder = true;
-//    }
-//
-//    public void removeReminder() {
-//        this.reminder = false;
-////    }
-//    }
-
 
 
 }

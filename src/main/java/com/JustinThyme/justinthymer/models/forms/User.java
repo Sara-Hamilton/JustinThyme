@@ -30,8 +30,8 @@ public class User {
 
 
     private String salt;
-    // standard phone number format for North America
 
+    // standard phone number format for North America
     @Pattern(regexp = "[(][2-9][0-8][0-9][)][2-9][0-9]{2}-[0-9]{4}", message="Not a valid number, use (XXX)XXX-XXXX format")
     private String phoneNumber;
 

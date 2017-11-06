@@ -11,7 +11,6 @@ public class SeedInPacket extends Seed {
     @GeneratedValue
     public int id;
 
-    //@OneToMany(mappedBy="packet_id")
     @ManyToOne
     private Packet packet;
 
@@ -28,8 +27,6 @@ public class SeedInPacket extends Seed {
 
     }
 
-
-   // public SeedInPacket findAllPacketSeeds() {return SeedInPacket;}
 
 
     public int getId() {return id; }

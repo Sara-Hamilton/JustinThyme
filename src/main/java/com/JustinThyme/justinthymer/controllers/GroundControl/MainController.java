@@ -1,27 +1,30 @@
 package com.JustinThyme.justinthymer.controllers.GroundControl;
+
 import com.JustinThyme.justinthymer.controllers.TwilioReminder.TwillTask;
 import com.JustinThyme.justinthymer.models.converters.HashPass;
+import com.JustinThyme.justinthymer.models.converters.SeedToPacketSeed;
 import com.JustinThyme.justinthymer.models.data.PacketDao;
 import com.JustinThyme.justinthymer.models.data.SeedDao;
 import com.JustinThyme.justinthymer.models.data.SeedInPacketDao;
 import com.JustinThyme.justinthymer.models.data.UserDao;
-import com.JustinThyme.justinthymer.models.converters.SeedToPacketSeed;
 import com.JustinThyme.justinthymer.models.forms.Packet;
 import com.JustinThyme.justinthymer.models.forms.Seed;
 import com.JustinThyme.justinthymer.models.forms.SeedInPacket;
 import com.JustinThyme.justinthymer.models.forms.User;
-import org.codehaus.groovy.util.HashCodeHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
-import javax.servlet.http.Cookie;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Timer;
 
 @Controller
 @RequestMapping("JustinThyme")
@@ -169,8 +172,6 @@ public class MainController {
             model.addAttribute("title", "Try again");
             model.addAttribute(newUser);
             model.addAttribute("areas", Seed.Area.values());
-            System.out.println("++" + password);
-            System.out.println("--" + verifyPassword);
             if (password != "" && !password.equals(verifyPassword)) {
                 model.addAttribute("errorMessage", "Passwords do not match.");
             }
@@ -313,7 +314,7 @@ public class MainController {
                 model.addAttribute("phoneNumberChangedMessage", "Phone number has been changed.");
             }
             aUser.setPhoneNumber(user.getPhoneNumber());
-            // note empty seed packet if user changes area, but user keeps packet
+            // empties seed packet if user changes area, but user keeps packet
             if (AreaChanged) {
                 Packet aPacket = packetDao.findByUserId(aUser.getId());
                 if (aPacket != null) {
@@ -392,7 +393,7 @@ public class MainController {
             return "/change-password";
         }
 
-        //note keeps original salt
+        //user keeps original salt
         String newHash = HashPass.generateHash(salt + newPassword);
         aUser.setPassword(newHash);
         aUser.setSalt(salt);
