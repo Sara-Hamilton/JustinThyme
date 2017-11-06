@@ -21,15 +21,6 @@
                     <span th:errors="*{username}" class="error"></span>
                 </div>
 
-                <div>
-                    <a href="/JustinThyme/change-password">Change password</a>
-                    <p></p>
-                </div>
-
-                <div>
-                    <a href="/JustinThyme/unsubscribe">Unsubscribe</a>
-                </div>
-
                 <div class="form-group">
                     <label th:for="password"></label>
                     <input class="hidden" th:value="*{password}" th:field="*{password}" type="text"/>
@@ -55,15 +46,19 @@
                     <span th:errors="*{area}" class="error"></span>
                 </div>
 
-                <input type="submit" value="Submit"/>
+                <input type="submit" class="btn btn-sm btn-primary" value="Submit"/>
             </form>
+            <div>
+                <hr/>
+                <br/>
+            </div>
+            <div>
+                <a href="/JustinThyme/change-password" class="btn btn-sm btn-primary">Change password</a>
+                <a href="/JustinThyme/unsubscribe" class="btn btn-sm btn-primary">Unsubscribe</a>
+            </div>
         </div>
     </div>
 </div>
-
-
-<h3><a href="/JustinThyme/unsubscribe">Unsubscribe</a></h3>
-
 
 <div th:replace="fragments :: javascript"></div>
 </body>
