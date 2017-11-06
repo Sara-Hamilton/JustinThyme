@@ -3,6 +3,7 @@ package com.JustinThyme.justinthymer.models.forms;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import java.sql.Timestamp;
 import java.util.Date;
 
 
@@ -51,9 +52,9 @@ public class Seed {
                 plantDate = new Date(118, 8, 1, 19, 05);
                 break;
             case TONIGHT:
-                //Date now = new Timestamp(System.currentTimeMillis());
-                //plantDate = now;
-                plantDate = new Date(117, 9, 23, 9, 33);
+                Date now = new Timestamp(System.currentTimeMillis());
+                plantDate = now;
+               // plantDate = new Date(117, 9, 23, 9, 33);
                 break;
             default:
                plantDate = null;

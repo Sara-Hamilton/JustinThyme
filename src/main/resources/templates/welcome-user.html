@@ -23,7 +23,8 @@
     <form method="post" action="welcome-user">
         <tr th:each="seed :${seeds}">
             <td th:text="${seed.name}"></td>
-            <td th:text="${seed.plantDate}"></td>
+            <td th:if="${seed.name} == DEMO">How soon is now?</td>
+            <td th:unless="${seed.name} == DEMO" th:text="${seed.plantDate}"></td>
 
             <td>
                 <div class="btn-group btn-toggle">
