@@ -3,7 +3,7 @@ package com.JustinThyme.justinthymer.controllers.TwilioReminder;
 import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
-//import com.JustinThyme.justinthymer.controllers.TwilioReminder.TwillSend.*;
+
 
 public class TwillTask {
     Timer timer;

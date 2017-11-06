@@ -22,7 +22,6 @@ public class TwillSend {
                 new PhoneNumber("XXXXXXXXXXX"),//number from (this will be your Twillio number)
 
 
-
                 message).create();//message from form and passed via model
 
         System.out.println(twill_message.getSid());

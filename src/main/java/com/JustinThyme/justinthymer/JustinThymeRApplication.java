@@ -11,7 +11,6 @@ import java.util.List;
 
 import static com.JustinThyme.justinthymer.models.forms.Seed.Area.*;
 import static com.JustinThyme.justinthymer.models.forms.Seed.Season.*;
-import static org.thymeleaf.util.StringUtils.length;
 
 @SpringBootApplication
 public class JustinThymeRApplication {
@@ -25,9 +24,8 @@ public class JustinThymeRApplication {
 		return (String... args) -> {
 
 			//seedDao.save(new Seed("carrot", WESTCOAST, FALL, new Date(117, 9, 7, 19, 41)));
-			//note having trouble instantiating with default for reminder, so changed seed constructor
 			//note Date structure see notes in TwillController for details (year(-1900), month(-1), day, hour, minute)
-
+            //api data for planting will need to be in above format
 
             List<Seed> seedsPopulated = seedDao.findAll();
             if (seedsPopulated.size() == 0) {
