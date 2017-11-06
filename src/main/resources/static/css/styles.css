@@ -67,7 +67,7 @@ position: relative;
     font-weight:bold;
 }
 
-.btn.btn-primary.btn-sm {
+.btn.btn-primary.btn-sm, .btn.btn-primary.active {
     background-color:#2dcf5a;
     border:0;
 }

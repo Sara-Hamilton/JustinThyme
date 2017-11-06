@@ -33,7 +33,7 @@
                 </div>
             </td>
 
-            <td><button type="submit" name="seedToRemoveIds" th:value="${seed.getId()}">Remove</button></td>
+            <td><button type="submit" class="btn btn-sm btn-primary" name="seedToRemoveIds" th:value="${seed.getId()}">Remove</button></td>
 
             <input type="hidden" th:value="${user.getId()}" name="userId" />
         </tr>
@@ -42,12 +42,14 @@
 
     <form method="post" action = "welcome-user">
         <h3 th:text="|Here are some seeds that grow in your area: ${user.area.name}|">Here are some more seeds that grow in your area:</h3>
-            <ul th:each="seed : ${seedsLeft}" class="list-unstyled">
+        <p>Check what seeds you like and we will automatically send you updates!</p>
+        <ul th:each="seed : ${seedsLeft}" class="list-unstyled">
                 <li><input th:id="${seed.name}"  type="checkbox" name="seedIds" th:value="${seed.getId()}"/>
                 <label th:for="${seed.name}" th:text="${seed.name}"></label></li>
             </ul>
         <input type="hidden" th:value="${user.getId()}" name="userId" />
-        <input type="submit" class="btn btn-sm btn-primary" value ="Add more"/>
+        <input th:if="${seeds.size()==0}" type="submit" class="btn btn-sm btn-primary" value ="Add to My List"/>
+        <input th:if="${seeds.size()!=0}" type="submit" class="btn btn-sm btn-primary" value ="Add more"/>
     </form>
 
 </div>
