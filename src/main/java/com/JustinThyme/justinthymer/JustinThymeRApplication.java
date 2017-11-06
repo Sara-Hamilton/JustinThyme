@@ -131,6 +131,8 @@ public class JustinThymeRApplication {
                 seedDao.save(new Seed("DEMO", NORTHEAST, TONIGHT));
                 seedDao.save(new Seed("DEMO", FLORIDA, TONIGHT));
                 seedDao.save(new Seed("DEMO", SOUTHEAST, TONIGHT));
+                seedDao.save(new Seed("DEMO", SOUTHWEST, TONIGHT));
+
 
             }
         };
