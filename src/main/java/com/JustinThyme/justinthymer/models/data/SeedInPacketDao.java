@@ -2,7 +2,6 @@ package com.JustinThyme.justinthymer.models.data;
 
 
 import com.JustinThyme.justinthymer.models.forms.Packet;
-import com.JustinThyme.justinthymer.models.forms.Seed;
 import com.JustinThyme.justinthymer.models.forms.SeedInPacket;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
@@ -20,7 +19,7 @@ public interface SeedInPacketDao extends CrudRepository<SeedInPacket, Integer> {
 
     SeedInPacket findById(int id);
 
-    //List<SeedInPacket> findAll();
+    SeedInPacket findByName(String name);
 
 
 }
