@@ -28,12 +28,13 @@
 
             <td>
                 <div class="btn-group btn-toggle">
-                    <button class="btn btn-default" type="submit" name="ON" th:value="${seed.getId()}" th:if="${seed.getReminder() == true}">ON</button>
-                    <button class="btn btn-primary active" type="submit" name="OFF" th:value="${seed.getId()}" th:if="${seed.getReminder() == false}">OFF</button>
+                    <button class="btn btn-default active" type="submit" name="ON" th:value="${seed.getId()}" th:if="${seed.getReminder() == true}">ON</button>
+                    <button class="btn btn-default" type="submit" name="OFF" th:value="${seed.getId()}" th:if="${seed.getReminder() == false}">OFF</button>
                 </div>
             </td>
 
-            <td><button type="submit" class="btn btn-sm btn-primary" name="seedToRemoveIds" th:value="${seed.getId()}">Remove</button></td>
+            <td><button type="submit" class="btn btn-sm btn-primary" name="seedToRemoveIds" th:value="${seed.getId()}">
+                <i class="fa fa-trash"></i> Remove</button></td>
 
             <input type="hidden" th:value="${user.getId()}" name="userId" />
         </tr>
