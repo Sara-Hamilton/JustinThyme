@@ -9,10 +9,10 @@ buildscript {
 	dependencies {
 		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
 		classpath ("org.junit.platform:junit-platform-gradle-plugin:1.0.1")
-		//classpath("org.springframework.security.crypto.password;")
 	}
 }
 
+apply plugin: 'distribution'
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'org.springframework.boot'
@@ -24,11 +24,13 @@ sourceCompatibility = 1.8
 
 repositories {
 	mavenCentral()
+	jcenter()
 }
 
+//mainClassName = "Main"
 
 dependencies {
-	//compile('org.springframework.security.crypto.password')
+
 
 	compile group: "com.twilio.sdk", name: "twilio", version: "7.11.+"
 	compile('org.springframework.boot:spring-boot-starter-data-jpa')
@@ -37,6 +39,19 @@ dependencies {
 	compile('org.springframework.boot:spring-boot-starter-web')
 	runtime('org.springframework.boot:spring-boot-devtools')
 	testCompile('org.springframework.boot:spring-boot-starter-test')
+
+	//runtime "org.slf4j:slf4j-simple:1.7.12"
+	compile "com.heroku.sdk:heroku-jdbc:0.1.1"
+	compile "org.postgresql:postgresql:9.4-1201-jdbc4"
+	testCompile 'junit:junit:4.11'
+
+}
+
+//task stage(dependsOn: ['build', 'clean'])
+//build.mustRunAfter clean
+
+task stage {
+	dependsOn installDist
 }
 
 bootRun {
