@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleag.org/">
+<html lang="en" xmlns:th="http://www.thymeleaf.org/">
 
 <head th:replace="fragments :: head">
 
@@ -7,5 +7,16 @@
 
 <body>
 
+<nav th:replace="fragments :: navigation"></nav>
+
+
+<h1 th:text="${title}"></h1>
+
+<form method="post" style="max-width:600px;">
+    <input type="submit" value="Logout"/>
+</form>
+
+
+<div th:replace="fragments :: javascript"></div>
 </body>
 </html>

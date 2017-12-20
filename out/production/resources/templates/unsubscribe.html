@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org/">
+
+<head th:replace="fragments :: head">
+
+</head>
+<body>
+<nav th:replace="fragments :: navigation"></nav>
+
+
+<h1>Do you really want to unsubscribe?</h1>
+
+<form method="post" style="max-width:600px;">
+    <input type="submit" name="yup" value="While signing up for this service is the best decision of my life I must with a heavy heart unsubscirbe."/>
+</form>
+
+
+
+
+<div th:replace="fragments :: javascript"></div>
+</body>
+</html>

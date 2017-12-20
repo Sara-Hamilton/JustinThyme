@@ -1,54 +1,81 @@
 package com.JustinThyme.justinthymer.models.forms;
-
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
-
+//
+//import org.junit.jupiter.api.AfterEach;
+//import org.junit.jupiter.api.BeforeEach;
+//import org.junit.jupiter.api.Test;
+//
+import static com.JustinThyme.justinthymer.models.forms.Seed.Area.WESTCOAST;
+import static com.JustinThyme.justinthymer.models.forms.Seed.Season.WINTER;
+import com.JustinThyme.justinthymer.models.data.SeedDao;
+import org.junit.Test;
+//import java.util.Date;
+//
 class SeedTest {
-    @BeforeEach
-    void setUp() {
-    }
+    //
+    SeedDao seedDao;
+    Seed aSeed = new Seed("Beets", WESTCOAST, WINTER);
+//
+//
+//    @BeforeEach
+//    void setUp() {
+//    }
+//
+//    @AfterEach
+//    void tearDown() {
+//    }
+//
+//    @Test
+//    void getId() {
+//        int seedId = aSeed.getId();
+//
+//        assert seedId == aSeed.id;
+//
+//        System.out.println(seedId);
+//    }
+//
+//    @Test
+//    void getName() {
+//        String seedName = aSeed.getName();
+//
+//        assert seedName.equals(aSeed.name);
+//
+//        System.out.println(seedName);
+//    }
+//
+//    @Test
+//    void getArea() {
+//        Seed.Area seedArea = aSeed.getArea();
+//
+//        assert seedArea.equals(aSeed.area);
+//
+//        System.out.println(seedArea);
+//    }
+//
 
-    @AfterEach
-    void tearDown() {
-    }
-
-    @Test
-    void getId() {
-    }
-
-    @Test
-    void getName() {
-    }
-
-    @Test
-    void setName() {
-    }
-
-    @Test
-    void getArea() {
-    }
-
-    @Test
-    void setArea() {
-    }
 
     @Test
     void getSeason() {
-    }
+        Seed.Season seedSeason = aSeed.getSeason();
 
-    @Test
-    void setSeason() {
-    }
+        assert seedSeason.equals(aSeed.season);
 
-    @Test
-    void getPlantDate() {
+        System.out.println(seedSeason);
     }
-
-    @Test
-    void setPlantDate() {
-    }
-
 }
+//
+//
+//    @Test
+//    void getPlantDate() {
+//        Date seedPlantDate = aSeed.getPlantDate();
+//
+//        assert seedPlantDate.equals(aSeed.plantDate);
+//
+//        System.out.println(seedPlantDate);
+//    }
+//
+//    @Test
+//    void getReminder() {
+//
+//    }
+//
+//}

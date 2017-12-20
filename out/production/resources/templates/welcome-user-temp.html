@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org/">
+
+<head th:replace="fragments :: head">
+
+</head>
+<body>
+<nav th:replace="fragments :: navigation"></nav>
+
+
+<h1>Progress is being made, wheels are in motion, [insert platitude here]!</h1>
+<p th:text="${session.user.username}" th:unless="${session == null}">[...]</p>
+
+<div th:replace="fragments :: javascript"></div>
+</body>
+</html>

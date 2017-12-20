@@ -50,4 +50,4 @@ nbdist/
 
 ### Sensitive data ###
 tokens.txt
-
+.env

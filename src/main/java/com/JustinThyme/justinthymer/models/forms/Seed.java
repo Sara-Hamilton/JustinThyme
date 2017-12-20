@@ -3,25 +3,37 @@ package com.JustinThyme.justinthymer.models.forms;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import java.sql.Timestamp;
 import java.util.Date;
-import java.util.List;
 
 
 @Entity
 public class Seed {
-
+//TODO before production change all id values to long
     @Id
     @GeneratedValue
-    private int id;
+    public int id;
     public String name;
 
     public enum Area {
-        WESTCOAST, INNERNW, INNERSW, SOUTH, MIDNORTH, EASTCOAST, FLORIDA
+
+        WESTCOAST ("West Coast"), NORTHWEST("Northwest"), SOUTHWEST ("Southwest"),
+        MIDSOUTH ("South"), MIDNORTH ("Mid North"), NORTHEAST ("North East"), SOUTHEAST ("South East"),
+        FLORIDA ("Florida");
+
+        private final String name;
+
+        Area(String name) { this.name = name;}
+
+        public String getName() {
+            return name;
+        }
+
     }
 
 
     public enum Season {
-        WINTER, SPRING, SUMMER, FALL
+        WINTER, SPRING, SUMMER, FALL, TONIGHT,
     }
 
     public Date simpleDateGet (Season aSeason) {
@@ -39,6 +51,11 @@ public class Seed {
             case FALL:
                 plantDate = new Date(118, 8, 1, 19, 05);
                 break;
+            case TONIGHT:
+                Date now = new Timestamp(System.currentTimeMillis());
+                plantDate = now;
+               // plantDate = new Date(117, 9, 23, 9, 33);
+                break;
             default:
                plantDate = null;
         }
@@ -48,23 +65,17 @@ public class Seed {
     public Area area;
     public Season season;
     public Date plantDate;
-    //public String message;
-    Boolean reminder; //note package private so can set in Packet
 
-//    @ManyToMany
-//    private List<Packet> packets = new ArrayList<>();
+    Boolean reminder; //note package private so can set in Packet
 
 
     //note reminder not in constructor so defaulted to false (intentional)
-    public Seed(String aName, Area anArea, Season aSeason) {
+    public Seed(String aName, Area anArea, Season aSeason){  //}, Date plantDate) {
         this.name = aName;
         this.area = anArea;
         this.season = aSeason;
-        //this.plantDate = aDate;
-        //Object self;
+        //this.plantDate = aDate; note expand with api later perhaps
         this.plantDate = simpleDateGet(aSeason);
-        //this.packets = packets;
-        this.reminder = false;
     }
 
     public Seed () { }
@@ -78,6 +89,7 @@ public class Seed {
     public void setName(String name) {
         this.name = name;
     }
+
 
     public Area getArea() {
         return area;
@@ -102,12 +114,9 @@ public class Seed {
         this.plantDate = plantDate;
     }
 
-    //note following in Packet for now
-//    public Boolean getReminder() {
-//        return reminder;
-//    }
-//
-//    public void setReminder(Boolean reminder) {
-//        this.reminder = reminder;
-//    }
+    public Boolean getReminder() {
+        return reminder;
+    }
+
+
 }

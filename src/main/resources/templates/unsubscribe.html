@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org/">
+
+<head th:replace="fragments :: head">
+
+</head>
+<body>
+<nav th:replace="fragments :: navigation"></nav>
+
+<div class="container-fluid">
+    <h1>Do you really want to unsubscribe?</h1>
+
+    <form method="post">
+        <input type="submit" name="yup" class="btn btn-sm btn-primary" value="Do you really want to unsubscribe?"/>
+    </form>
+</div>
+
+<div th:replace="fragments :: javascript"></div>
+</body>
+</html>

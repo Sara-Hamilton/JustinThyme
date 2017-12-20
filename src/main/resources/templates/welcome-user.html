@@ -1,23 +1,60 @@
 <!DOCTYPE html>
-<!--<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">-->
-<!--TODO why does intelliJ recommend the above ref?-->
 
-<html lang="en" xmlns:th="http://www.thymeleag.org/">
+<html lang="en" xmlns:th="http://www.thymeleaf.org/" xmlns="http://www.w3.org/1999/html">
 
 <head th:replace="fragments :: head">
 
 </head>
 <body>
 
-<h1 th:text="|Welcome ${user.username}|">Default welcome</h1>
+<nav th:replace="fragments :: navigation"></nav>
 
-<h2>Here are the contents of your seed packet:</h2>
-<tr th:each="seed : ${user.seeds}">
-    <ul>
-        <li th:text="|${seed.name} crops are typcically grown in ${seed.season}|. Reminder: {seed.reminder}"></li>
-        <!--TODO make seed.reminder == "ON" or "OFF"-->
-    </ul>
-</tr>
 
+<div class="container-fluid" >
+    <h1 th:text="|Welcome ${user.username}|">Default welcome</h1>
+    <table class="table">
+        <tr th:if="${seeds.size()!=0}">
+            <th>Name</th>
+            <th>Plant Date</th>
+            <th>Reminder</th>
+            <th></th>
+        </tr>
+
+    <form method="post" action="welcome-user">
+        <tr th:each="seed :${seeds}">
+            <td th:text="${seed.name}"></td>
+            <td th:if="${seed.name} == DEMO">How soon is now?</td>
+            <td th:unless="${seed.name} == DEMO" th:text="${seed.plantDate}"></td>
+
+            <td>
+                <div class="btn-group btn-toggle">
+                    <button class="btn btn-default active" type="submit" name="ON" th:value="${seed.getId()}" th:if="${seed.getReminder() == true}">ON</button>
+                    <button class="btn btn-default" type="submit" name="OFF" th:value="${seed.getId()}" th:if="${seed.getReminder() == false}">OFF</button>
+                </div>
+            </td>
+
+            <td><button type="submit" class="btn btn-sm btn-primary" name="seedToRemoveIds" th:value="${seed.getId()}">
+                <i class="fa fa-trash"></i> Remove</button></td>
+
+            <input type="hidden" th:value="${user.getId()}" name="userId" />
+        </tr>
+    </form>
+    </table>
+
+    <form method="post" action = "welcome-user">
+        <h3 th:text="|Here are some seeds that grow in your area: ${user.area.name}|">Here are some more seeds that grow in your area:</h3>
+        <p>Check what seeds you like and we will automatically send you updates!</p>
+        <ul th:each="seed : ${seedsLeft}" class="list-unstyled">
+                <li><input th:id="${seed.name}"  type="checkbox" name="seedIds" th:value="${seed.getId()}"/>
+                <label th:for="${seed.name}" th:text="${seed.name}"></label></li>
+            </ul>
+        <input type="hidden" th:value="${user.getId()}" name="userId" />
+        <input th:if="${seeds.size()==0}" type="submit" class="btn btn-sm btn-primary" value ="Add to My List"/>
+        <input th:if="${seeds.size()!=0}" type="submit" class="btn btn-sm btn-primary" value ="Add more"/>
+    </form>
+
+</div>
+
+<div th:replace="fragments :: javascript"></div>
 </body>
 </html>

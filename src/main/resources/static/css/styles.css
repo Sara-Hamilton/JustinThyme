@@ -1,0 +1,124 @@
+@import url("//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css");
+
+.navbar-inverse {
+background-color:#2dcf5a;
+border-color:#2dcf5a;
+margin-bottom:0px;}
+
+.navbar .nav > li > a, .navbar .nav > li, .navbar-inverse .navbar-brand {
+color:white;
+text-shadow:none;
+}
+
+.navbar .nav > li > a:hover, .navbar .nav > li, .navbar-inverse .navbar-brand:hover {
+color:#233930;
+text-shadow:none;
+}
+
+.navbar-inverse .navbar-toggle.collapsed, .navbar-inverse .navbar-toggle{
+border-color:white;
+}
+
+.navbar-inverse .navbar-toggle.collapsed:hover, .navbar-inverse .navbar-toggle:hover,
+.navbar-inverse .navbar-toggle.collapsed:focus, .navbar-inverse .navbar-toggle:focus{
+border-color:#233930;
+background-color:#233930;
+}
+
+.hero-image {
+background-image: url("../assets/splash-bg.jpg");
+height:100vh;
+background-position: center;
+background-repeat: no-repeat;
+background-size: cover;
+position: relative;
+}
+
+.hero-text {
+    text-align: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+}
+
+.hero-text > a {
+    color:#2dcf5a;
+    }
+
+.hero-text > a:hover{
+    color:white;
+}
+
+.hero-text > #btn-splash{
+    background-color:#2dcf5a;
+    color:white;
+    border-style:none;
+    }
+
+.hero-text > #btn-splash:hover{
+    background-color:white;
+    color:#2dcf5a;
+    }
+
+.error {
+    color: #f44336;
+    font-weight:bold;
+}
+
+.btn.btn-primary.btn-sm, .btn.btn-primary.btn-md{
+    background-color:#2dcf5a;
+    border:0;
+}
+
+.btn.btn-primary.btn-sm:hover, .btn.btn-primary.btn-md:hover {
+    background-color:#233930;
+    border:0;
+}
+
+.btn.btn-danger.btn-sm {
+    background-color:#f44336;
+    border:0;}
+
+.btn.btn-danger.btn-sm:hover {
+    background-color:#961d15;}
+
+input[type=checkbox] {
+    opacity:0;
+}
+
+input[type=checkbox]+label:before{
+    font-family:FontAwesome;
+    display:inline-block;
+    letter-spacing:10px;
+}
+
+input[type=checkbox] + label:before {
+    content: "\f06c";
+    color:#c8ce9b;
+}
+
+input[type=checkbox]:checked + label:before {
+    color:#2dcf5a;
+}
+
+ul.leaf {
+    list-style-type:none;
+    }
+
+
+ul.leaf:before {
+    font-family:FontAwesome;
+    content:"\f06c";
+    float:left;
+    width:1.4em;
+}
+
+.btn.btn-default.active{
+background-color:#2dcf5a;
+color:white;
+border:0;
+}
+
+

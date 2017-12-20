@@ -1,11 +1,26 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleag.org/">
+<html lang="en" xmlns:th="http://www.thymeleaf.org/">
 
-<head th:replace="fragments :: head">
-
-</head>
+<head th:replace="fragments :: head"></head>
 
 <body>
 
+<nav th:replace="fragments :: navigation"></nav>
+
+    <div class="container-fluid hero-image">
+        <div class="hero-text">
+            <h1 th:text="${title}"></h1>
+
+            <p>JustinThyme is an online service that takes the guesswork out of what, when, and where to plant.
+            Just answer a few questions and we'll give you a customized list of fruits and vegetables that
+            grow best in your area.  We'll even send you a text message when your seeds are in season. Go from
+            a greenhorn to a green thumb with JustinThyme!</p>
+
+            <a href="/JustinThyme/signup" class="btn btn-lg btn-default" id="btn-splash">Sign up</a><br/>
+            <a href="/JustinThyme/login">I already have an account.</a>
+        </div>
+    </div>
+
+<div th:replace="fragments :: javascript"></div>
 </body>
 </html>

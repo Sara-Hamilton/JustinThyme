@@ -1,7 +1,6 @@
 package com.JustinThyme.justinthymer.models.forms;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,44 +11,56 @@ public class Packet {
     @GeneratedValue
     private int id;
 
-    @NotNull
-
+    @OneToOne
     @JoinColumn(name="user_id")
-    private int user_id;
+    private User user;
 
 
-    @ManyToMany
-    List<Seed> seeds = new ArrayList<>();
 
-
-    public Packet() { }
-
-
-    public int getId() { return id; }
-
-    public int getUser_id() {
-        return user_id;
+    public int getId() {
+        return id;
     }
-    
-    public List<Seed> getSeeds() {
+
+    @OneToMany(mappedBy="packet")
+    private List<SeedInPacket> seeds;
+
+
+    public Packet(Integer user_id, List<SeedInPacket> seeds) {
+    }
+
+
+    public Packet() {
+    }
+
+
+    public int getPacketId() {
+        return id;
+    }
+
+
+    public List<SeedInPacket> getSeeds() {
         return seeds;
     }
 
-    public void setSeeds(List<Seed> seeds) {
+
+    public void setSeeds(List<SeedInPacket> seeds) {
         this.seeds = seeds;
     }
 
-    public void addSeed(Seed newSeed) {
+    public void addSeed(SeedInPacket newSeed) {
         seeds.add(newSeed);
     }
-    public void removeSeed(Seed oldSeed) {
+
+    public void removeSeed(SeedInPacket oldSeed) {
         seeds.remove(oldSeed);
     }
 
-    public void setReminder(Seed aSeed) {
-        aSeed.reminder = true;
+    public User getUser() {
+        return user;
     }
-    public void removeReminder(Seed aSeed) {
-        aSeed.reminder = false;
+
+    public void setUser(User user) {
+        this.user = user;
     }
+
 }
